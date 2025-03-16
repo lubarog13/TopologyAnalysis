@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Fileupload, Helper, Label, Textarea } from "flowbite-svelte";
-
+    import TopologyTable from "./TopologyTable.svelte";
     const fileuploadprops = {
         id: "fileupload",
         label: "Upload file",
@@ -38,9 +38,9 @@
     }
 </script>
 
-<div class="mx-auto w-full max-w-2xl xl:max-w-5xl xl:grid-cols-[minmax(0,1fr)_var(--container-2xs)]">
-    <div class="px-4 pt-10 pb-24 sm:px-6 xl:pr-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <form class="pt-10">
+<div class="h-full mx-auto w-full max-w-2xl xl:max-w-5xl xl:grid-cols-[minmax(0,1fr)_var(--container-2xs)]">
+    <div class="sm:min-h-200 px-4 pt-10 pb-24 sm:px-6 xl:pr-0 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-16">
+    <form class="pt-10 h-fit">
         <Label class="pb-2">Введите описание</Label>
         <Textarea rows={5} class="mb-2" placeholder="Описание топологии" bind:value={topology} />
         <Label class="pb-2">... или загрузите файл</Label>
@@ -51,5 +51,6 @@
             <Helper>Поддерживаемые форматы: CIF, TXT</Helper>
         {/if}
     </form>
+    <TopologyTable />
     </div>
 </div>
