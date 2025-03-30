@@ -2,8 +2,6 @@ import { Element } from "./Element";
 
 export class Cell {
     id: number;
-    x: number;
-    y: number;
     x_coord: number;
     y_coord: number;
     x_k: number;
@@ -13,9 +11,7 @@ export class Cell {
     elements: Element[];
 
     constructor(
-        id: number, 
-        x: number, 
-        y: number, 
+        id: number,
         x_coord: number, 
         y_coord: number, 
         x_k: number = 1, 
@@ -24,8 +20,6 @@ export class Cell {
         height: number = 0
     ) {
         this.id = id;
-        this.x = x;
-        this.y = y;
         this.x_coord = x_coord;
         this.y_coord = y_coord;
         this.x_k = x_k;
@@ -33,6 +27,15 @@ export class Cell {
         this.width = width;
         this.height = height;
         this.elements = [];
+    }
+
+    setCoords(x: number, y: number) {
+        this.x_coord = x;
+        this.y_coord = y;
+        this.elements.forEach(element => {
+            element.cellX = this.x_coord;
+            element.cellY = this.y_coord;
+        })
     }
 
     setX_k(x_k: number) {
@@ -62,16 +65,19 @@ export class Cell {
     }
 
     setElementsFromDescription(description: Array<string>): void {
-        description = description.map((it) => it.replaceAll(";", "").trim());
+        description = description.map((it) => it.trim());
         let temp = description[0].split(' ');
         this.x_k = Number(temp[2]);
         this.y_k = Number(temp[3]);
         temp =  description[1].split(' ');
-        let name = temp[2].slice(1, -1);
+        let name = ''
         let i = 2;
         let layout = 0;
         for(;i<description.length;) {
-            if (description[i].startsWith('L')) {
+            if(description[i].startsWith('9')) {
+                name = description[i].split(' ')[1]
+            }
+            if (description[i].startsWith('L') && description[i+1]?.startsWith('P')) {
                 temp = description[i+1].split(' ');
                 let element = new Element(
                     name,
