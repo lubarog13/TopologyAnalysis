@@ -1,9 +1,9 @@
-import { elementsList } from "../../utils/consts/elements.list";
+import { defaultElement, elementsList, type LayoutElement } from "../../utils/consts/elements.list";
 
 export class Element {
     name: string;
     code: string;
-    color: string;
+    layoutColor: LayoutElement;
     cellX: number ;
     cellY: number ;
     cellX_k: number ;
@@ -18,7 +18,7 @@ export class Element {
         this.cellY = 0;
         this.cellX_k = 1;
         this.cellY_k = 1;
-        this.color = elementsList[code as keyof typeof elementsList] || '#fff';
+        this.layoutColor = elementsList[code as keyof typeof elementsList] || defaultElement;
         if (typeof positions === 'string') {
             this.positions = positions.split(' ').map(Number);
         } else {
@@ -30,11 +30,13 @@ export class Element {
 
     draw(ctx: CanvasRenderingContext2D) {
         try {
-            ctx.fillStyle = this.color;
+            if(this.layoutColor.visible) {
+            ctx.fillStyle = this.layoutColor.color;
             ctx.fillRect(this.cellX + this.positions[0], 
                 this.cellY + this.positions[1], 
                 (this.positions[2] - this.positions[0]) * this.cellX_k, 
                 (this.positions[5] - this.positions[1]) * this.cellY_k);
+            }
         } catch (error) {
             throw new Error(`Error drawing element ${this.name}: ${error}`);
         }

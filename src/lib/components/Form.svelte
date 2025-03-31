@@ -88,6 +88,7 @@
 			{/if}
 			<Button class="mt-4" type="submit">Сохранить</Button>
 		</form>
+		<div class="w-100"></div>
 		<TopologyTable cells={cells} globalCell={globalCell} />
 	</div>
 </div>
