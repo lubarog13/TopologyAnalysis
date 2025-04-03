@@ -11,6 +11,7 @@ export class Element {
     positions: Array<number>;
     layout: number;
     rotation?: number;
+    coords: Array<number> = [];
     constructor(name: string, code: string, positions: Array<number> | string, layout: number, rotation = 0) {
         this.name = name;
         this.code = code;
@@ -26,6 +27,7 @@ export class Element {
         }
         this.layout = layout;
         this.rotation = rotation;
+        this.setCoords()
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -40,6 +42,10 @@ export class Element {
         } catch (error) {
             throw new Error(`Error drawing element ${this.name}: ${error}`);
         }
+    }
+
+    setCoords() {
+        this.coords = [this.cellY + this.positions[1], this.cellX + this.positions[0] + (this.positions[2] - this.positions[0]) * this.cellX_k, this.cellY + this.positions[1] + (this.positions[2] - this.positions[0]) * this.cellX_k, this.cellX + this.positions[0]]
     }
 
     getSize(): [number, number] {

@@ -4,7 +4,9 @@
 	import { parseCif, parseCifV2 } from '../../utils/consts/methods';
   import { InfoCircleSolid } from 'flowbite-svelte-icons';
 	import type { Cell } from '$lib/classes/Cell';
-
+	import {tick} from "svelte";
+	import CellDiagram from './CellDiagram.svelte';
+	import type { GridCell } from '$lib/classes/GridCell';
   const fileuploadprops = {
 		id: 'fileupload',
 		label: 'Upload file',
@@ -18,8 +20,10 @@
 	let file = $state<File | null>(null);
 	let topology = $state('');
 	let cells = $state<Cell[]>([]);
+	let canRedraw: boolean = $state(false)
 	let globalCell = $state<Cell|undefined>();
-
+	let selectedCell = $state<GridCell|null>(null);
+	let showDiagram: boolean = $state(false);
 	function handleFileChange(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (input.files && input.files.length > 0) {
@@ -53,13 +57,27 @@
 						let content = parseCifV2(topology);
 						cells = content.cells;
 						globalCell = content.global;
-            console.log(cells)
+            canRedraw = true
+			tick().then(() => {
+				console.log(canRedraw)
+				canRedraw = false;
+			})
             parseError = false
         } catch (e) {
             console.log(e)
             parseError = true;
         }
     }
+	}
+
+	function onCellSelected(cell: GridCell | null) {
+		showDiagram = false;
+		if (cell) {
+			setTimeout(() => {
+				showDiagram = true;
+				selectedCell = cell;
+			}, 100);
+		}
 	}
 </script>
 
@@ -88,7 +106,11 @@
 			{/if}
 			<Button class="mt-4" type="submit">Сохранить</Button>
 		</form>
-		<div class="w-100"></div>
-		<TopologyTable cells={cells} globalCell={globalCell} />
+		<div class="w-100">
+			{#if showDiagram && selectedCell}
+				<CellDiagram cell={selectedCell} />
+			{/if}
+		</div>
+		<TopologyTable cells={cells} canRedraw={canRedraw} globalCell={globalCell} redrawComplete={() => {canRedraw = false}} onCellSelected={onCellSelected} />
 	</div>
 </div>
