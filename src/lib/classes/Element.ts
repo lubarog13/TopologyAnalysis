@@ -25,6 +25,18 @@ export class Element {
         } else {
             this.positions = positions;
         }
+        if (this.positions[0] > this.positions[2]) {
+            this.positions = [this.positions[2], this.positions[1],
+             this.positions[0], this.positions[3],
+              this.positions[6], this.positions[5],
+               this.positions[4], this.positions[7]]
+        }
+        if (this.positions[1] > this.positions[5]) {
+            this.positions = [this.positions[0], this.positions[5],
+             this.positions[2], this.positions[5],
+              this.positions[4], this.positions[1],
+              this.positions[6], this.positions[1]]
+        }
         this.layout = layout;
         this.rotation = rotation;
         this.setCoords()
@@ -45,7 +57,10 @@ export class Element {
     }
 
     setCoords() {
-        this.coords = [this.cellY + this.positions[1], this.cellX + this.positions[0] + (this.positions[2] - this.positions[0]) * this.cellX_k, this.cellY + this.positions[1] + (this.positions[2] - this.positions[0]) * this.cellX_k, this.cellX + this.positions[0]]
+        this.coords = [this.cellY + (this.positions[1])*this.cellY_k, 
+        this.cellX + (this.positions[2]) * this.cellX_k,
+         this.cellY + (this.positions[5]) * this.cellY_k,
+          this.cellX + (this.positions[0]) * this.cellX_k]
     }
 
     getSize(): [number, number] {

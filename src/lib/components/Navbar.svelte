@@ -9,7 +9,7 @@
     <NavHamburger  />
     <NavUl >
       <NavLi href="/">Старт</NavLi>
-      <NavLi href="/about">О программе</NavLi>
+      <NavLi href="/about">Как пользоваться</NavLi>
       <NavLi href="/agreement" on:click={(event) => {
         event.preventDefault();
         clickAgreement = true;

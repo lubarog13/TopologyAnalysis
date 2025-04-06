@@ -12,7 +12,7 @@
 		globalCell: Cell | undefined;
 		canRedraw: boolean,
 		redrawComplete: () => void,
-		onCellSelected: (cell: GridCell | null) => void
+		onCellSelected: (cell: Cell | GridCell | null) => void
 	}
 	let { cells, globalCell, canRedraw, redrawComplete, onCellSelected }: Props = $props();
 	let elements: Element[] = $state([])
@@ -22,8 +22,8 @@
 	let drawComplete: boolean = $state(false);
 	let selectedCell: Cell | GridCell | null = $state(null);
 	let showCustomGrid: boolean = $state(false);
-	let customGridRows: number = 5;
-	let customGridCols: number = 5;
+	let customGridRows: number = 10;
+	let customGridCols: number = 10;
 
 	onMount(() => {
 		canvas = document.getElementById('topology-table-canvas') as HTMLCanvasElement;
@@ -92,12 +92,20 @@
 					container.style.width = canvas.clientWidth * scaleToFit + 10 + 'px';
 					container.style.height = canvas.clientHeight * scaleToFit + 10 + 'px';
 				}
+				elements = [];
 				console.log(cells);
 				cells.forEach(cell => {
 					elements = [...elements, ...cell.elements];
 				})
 				if (globalCell) {
 					elements = [...elements, ...globalCell.elements];
+				}
+				for (let i = 0; i < elements.length; i++) {
+					for (let j = i + 1; j < elements.length; j++) {
+						if (elements[i].name === elements[j].name && elements[i].positions.length === elements[j].positions.length && elements[i].positions.every(function(value, index) { return value === elements[j].positions[index]})) {
+							elements.splice(j, 1);
+						}
+					}
 				}
 				drawComplete = true;
 			}
@@ -142,6 +150,7 @@
 									.borderCoords[0]}px;width: {cell.width}px;height: {cell.height}px;"
 								onclick={() => {
 									selectedCell = cells[index];
+									onCellSelected(selectedCell);
 								}}
 							></div>
 						{/if}

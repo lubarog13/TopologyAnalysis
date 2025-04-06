@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { GridCell } from "$lib/classes/GridCell";
+	import { GridCell } from "$lib/classes/GridCell";
+    import { Cell } from "$lib/classes/Cell";
 
     interface Props {
-        cell: GridCell
+        cell: Cell | GridCell
     }
 
     const { cell }: Props = $props()
@@ -14,8 +15,15 @@
     
     onMount(() => {
         Chart.register(...registerables);
-        
-        const elementEntries = Object.entries(cell.elements);
+
+        let elementEntries: [string, number][];
+        if (cell instanceof GridCell) {
+            elementEntries = Object.entries(cell.elements);
+        } else {
+            elementEntries = Object.entries(cell.getElementsAreasPercent());
+        }
+
+        console.log(elementEntries);
         
         if (elementEntries.length > 0) {
             new Chart(chartCanvas, {
@@ -24,8 +32,8 @@
                     labels: elementEntries.map(([code]) => code),
                     datasets: [{
                         data: elementEntries.map(([, area]) => area),
-                        backgroundColor: elementEntries.map(([code]) => 
-                            elementsList[code].color
+                        backgroundColor:  elementEntries.map(([code]) => 
+                            elementsList[code]?.color || '#ffffff'
                         )
                     }]
                 },

@@ -22,7 +22,7 @@
 	let cells = $state<Cell[]>([]);
 	let canRedraw: boolean = $state(false)
 	let globalCell = $state<Cell|undefined>();
-	let selectedCell = $state<GridCell|null>(null);
+	let selectedCell = $state<Cell | GridCell | null>(null);
 	let showDiagram: boolean = $state(false);
 	function handleFileChange(event: Event) {
 		const input = event.target as HTMLInputElement;
@@ -70,7 +70,7 @@
     }
 	}
 
-	function onCellSelected(cell: GridCell | null) {
+	function onCellSelected(cell: Cell | GridCell | null) {
 		showDiagram = false;
 		if (cell) {
 			setTimeout(() => {

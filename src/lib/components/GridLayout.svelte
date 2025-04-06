@@ -2,6 +2,7 @@
     import type {Element} from "$lib/classes/Element";
     import {GridCell} from "$lib/classes/GridCell";
     import {onMount} from "svelte";
+	import { elementsList } from "../../utils/consts/elements.list";
     interface Props {
         width: number,
         height: number,
@@ -23,13 +24,13 @@
         let heightCell = Math.round(height / cellsCountRows);
         for(let i = 0;i< cellsCountCols;i++) {
             for (let j = 0; j < cellsCountRows;j++) {
-                cells.push(new GridCell(widthCell * i, heightCell * j, widthCell, heightCell));
+                cells.push(new GridCell(widthCell * j, heightCell * i, widthCell, heightCell));
             }
         }
         console.log('cells', cells)
     }
     const selectCell = (index: number) => {
-        cells[index].setElementsAreas(elements)
+        cells[index].setElementsAreas(elements.filter(element => elementsList[element.code].visible))
         console.log(cells[index])
         selectedIndex = index;
         onCellSelected(cells[index])
@@ -38,7 +39,7 @@
 
 <div class="element-table absolute top-0 left-0 w-full h-full grid" style="grid-template-columns: repeat({cellsCountCols}, 1fr); grid-template-rows: repeat({cellsCountRows}, 1fr);">
     {#each cells as _, index}
-        <div class="cell w-full h-full outline-dotted outline-({index === selectedIndex ? '--color-primary-700' : '--color-gray-200'}) outline-2" onclick={() => selectCell(index)}>
+        <div class="cell w-full h-full outline-dotted outline-({index === selectedIndex ? '--color-red-700' : '--color-gray-200'}) outline-2" style="outline-color: {index === selectedIndex ? 'var(--color-red-700)' : 'var(--color-gray-700)'};outline-offset: -2px" onclick={() => selectCell(index)}>
         </div>
     {/each}
 </div>

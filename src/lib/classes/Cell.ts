@@ -93,10 +93,14 @@ export class Cell {
 				}
 				if (description[i].startsWith('L') && description[i + 1]?.startsWith('P')) {
 					temp = description[i + 1].split(' ');
+					let positions = temp.slice(1).map((it) => Number(it))
+					if (positions[0] === positions[2]) {
+						positions = [positions[0], positions[1], positions[4], positions[1], positions[4], positions[3], positions[0], positions[3]]
+					}
 					let element = new Element(
 						name,
 						description[i].split(' ')[1],
-						temp.slice(1).map((it) => Number(it)),
+						positions,
 						layout
 					);
 					this.addElement(element);
@@ -108,5 +112,13 @@ export class Cell {
 			}
 			i++;
 		}
+	}
+
+	getElementsAreasPercent(): {[key: string]: number} {
+		const areas: {[key: string]: number} = {};
+		this.elements.forEach((element) => {
+			areas[element.code] = element.getSize()[0] * element.getSize()[1] / ((this.borderCoords[1] - this.borderCoords[3]) * (this.borderCoords[2] - this.borderCoords[0]));
+		});
+		return areas;
 	}
 }
