@@ -26,7 +26,7 @@ export function parseCif(cif: string) : Array<Cell> {
     if (line.startsWith('DS')) {
       let lineArgs = line.split(' ');
       k = lineArgs.slice(2);
-      console.log(currentOperation, lineArgs[1], cellsColumn, !cellsColumn[lineArgs[1]])
+      // console.log(currentOperation, lineArgs[1], cellsColumn, !cellsColumn[lineArgs[1]])
       if (currentOperation === 'start' && !cellsColumn[lineArgs[1]]) {
         currentOperation = 'read_cell_column';
       }
@@ -79,7 +79,7 @@ export function parseCif(cif: string) : Array<Cell> {
       tempElementString.push(line)
     }
   }));
-  console.log(cellsColumn)
+  // console.log(cellsColumn)
   Object.keys(cellsColumn).sort().forEach((key) => {
     cellsColumn[key].cells.forEach((cell) => {
       cells.push(cell);
@@ -105,7 +105,7 @@ export function parseCifV2(cif: string): CellsContent {
       let lineArgs = line.split(' ');
       k = lineArgs.slice(2);
       if (currentOperation === 'start') {
-        console.log(lineArgs, Number(lineArgs[2]));
+        // console.log(lineArgs, Number(lineArgs[2]));
         globalCell = new Cell(Number(lineArgs[1]), 0, 0, Number(lineArgs[2]), Number(lineArgs[3]));
         tempElementString.push(line)
         currentOperation = 'read_cells';

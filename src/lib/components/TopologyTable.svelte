@@ -5,8 +5,10 @@
 	import type {GridCell} from "$lib/classes/GridCell";
 	import GridLayout from "$lib/components/GridLayout.svelte";
 	import type {Element} from "$lib/classes/Element";
-	import {Checkbox} from "flowbite-svelte";
-
+	import {Checkbox, Dropdown, DropdownItem, Label, Range} from "flowbite-svelte";
+	import { ChevronDownOutline } from 'flowbite-svelte-icons';
+	import debounce from 'debounce';
+	import DiagramLine from '$lib/components/DiagramLine.svelte';
 	interface Props {
 		cells: Cell[];
 		globalCell: Cell | undefined;
@@ -21,9 +23,13 @@
 	let scaleToFit: number = 1;
 	let drawComplete: boolean = $state(false);
 	let selectedCell: Cell | GridCell | null = $state(null);
+	let gridCells: GridCell[] = $state([]);
 	let showCustomGrid: boolean = $state(false);
-	let customGridRows: number = 10;
-	let customGridCols: number = 10;
+	let gridChanged: boolean = $state(false);
+	let customGridRows: number = $state(10);
+	let customGridCols: number = $state(10);
+	let maxGridRows: number = $state(30);
+	let maxGridCols: number = $state(30);
 
 	onMount(() => {
 		canvas = document.getElementById('topology-table-canvas') as HTMLCanvasElement;
@@ -53,7 +59,7 @@
 					if (cell.elements.length > 0) {
 						cell.setWidth(Math.max(...cell.elements.map((element) => element.getSize()[0])));
 						cell.setHeight(Math.max(...cell.elements.map((element) => element.getSize()[1])));
-						console.log(cell.width);
+						// console.log(cell.width);
 					}
 				});
 				let maxX = Math.max(...cells.map((cell) => cell.x_coord));
@@ -61,19 +67,19 @@
 						...cells.filter((cell) => cell.x_coord === maxX).map((cell) => cell.width)
 				);
 				canvas.width = maxX + maxSize / 2;
-				console.log(maxSize);
+				// console.log(maxSize);
 				let maxY = Math.max(...cells.map((cell) => cell.y_coord));
 				let maxSizeY = Math.max(
 						...cells.filter((cell) => cell.y_coord === maxY).map((cell) => cell.height)
 				);
 				canvas.height = maxY + maxSizeY / 2;
-				console.log(maxSizeY);
+				// console.log(maxSizeY);
 				if (globalCell) {
 					ctx.globalAlpha = 0.3;
 					globalCell.setWidth(canvas.width);
 					globalCell.setHeight(canvas.height);
 					// globalCell.setCoords(canvas.width / 2, canvas.height / 2);
-					console.log(globalCell);
+					// console.log(globalCell);
 					globalCell.draw(ctx);
 				}
 
@@ -93,7 +99,7 @@
 					container.style.height = canvas.clientHeight * scaleToFit + 10 + 'px';
 				}
 				elements = [];
-				console.log(cells);
+				// console.log(cells);
 				cells.forEach(cell => {
 					elements = [...elements, ...cell.elements];
 				})
@@ -107,26 +113,58 @@
 						}
 					}
 				}
+				maxGridRows = Math.floor(canvas.width / 2);
+				maxGridCols = Math.floor(canvas.height / 2);
 				drawComplete = true;
 			}
 	}
 
 
 	$effect(() => {
-		console.log(canRedraw)
+		// console.log(canRedraw)
 		if (canRedraw) {
 			redraw();
 		}
 	});
-</script>
+
+	const changeGrid = debounce((row: number, col: number) => {
+		gridChanged = true;
+		customGridRows = row;
+		customGridCols = col;
+		selectedCell = null;
+		gridCells = [];
+		onCellSelected(null);
+		setTimeout(() => {
+			gridChanged = false;
+		}, 300);
+	}, 300);
+
+	function setGridCells(cells: GridCell[]) {
+		gridCells = cells;
+	}
+</script>	
 
 <div
 	class="topology grid w-full grid-cols-1 gap-10 sm:col-span-2 sm:grid-cols-[minmax(0,_1fr)_350px]"
 >
 	<div class="w-full mt-10 sm:mt-0">
 		{#if drawComplete}
-		<Checkbox checked={showCustomGrid} on:change={() => {showCustomGrid=!showCustomGrid}}>Показать сетку</Checkbox>
+		<div class="flex flex-col gap-2">
+		<Checkbox class="mr-2" checked={showCustomGrid} on:change={() => {showCustomGrid=!showCustomGrid}}>Показать сетку</Checkbox>
+		{#if showCustomGrid}
+		<Label>Количество колонок: <span class="font-bold text-red-500">{customGridCols}</span></Label>
+		<Range id="range-cols" min="1" max={maxGridCols} value={customGridCols} on:change={(event) => changeGrid(customGridRows, Number((event.target as HTMLTextAreaElement).value)||1)}/>
+		<Label>Количество строк: <span class="font-bold text-red-500">{customGridRows}</span></Label>
+		<Range id="range-rows" min="1" max={maxGridRows} value={customGridRows} on:change={(event) => changeGrid(Number((event.target as HTMLTextAreaElement).value)||1, customGridCols)}/>
 		{/if}
+		</div>
+		{/if}
+		<div class="grid grid-cols-2 gap-1 grid-cols-[50px_minmax(0,_1fr)]">
+			{#if gridCells.length > 0	}
+				<DiagramLine className="mt-0 sm:mt-3" style="" direction="column" cells={gridCells} count={customGridRows} selectedElements={elements} color="var(--color-primary-700)" />
+			{:else}
+				<div class="w-full h-full mt-0 sm:mt-3  sm:mt-3"></div>
+			{/if}
 	<div
 		id="topology-table-container"
 		class="topology-table relative mt-0 grid max-h-50 min-h-50 w-full rounded-sm border-4 border-double border-(--color-primary-700) sm:mt-3 sm:min-h-150 {cells.length
@@ -157,13 +195,18 @@
 					{/each}
 				</div>
 			</div>
-			{#if showCustomGrid}
+			{#if showCustomGrid && !gridChanged}
 			<GridLayout elements={elements} cellsCountCols={customGridCols} cellsCountRows={customGridRows} width={canvas.width} height={canvas.height} onCellSelected={(cell) => {
 				selectedCell = cell;
 				onCellSelected(cell);
-			}}></GridLayout>
+			}} setGridCells={setGridCells}></GridLayout>
 			{/if}
 		{/if}
+	</div>
+	{#if gridCells.length > 0}
+	<div></div>
+	<DiagramLine className="" style="" direction="row" cells={gridCells} count={customGridCols} selectedElements={elements} color="var(--color-primary-700)" />
+	{/if}
 	</div>
 	</div>
 	<LayoutsList onElementChange={redraw} />

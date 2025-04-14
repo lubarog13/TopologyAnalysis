@@ -1,13 +1,17 @@
-import type { LayoutElement } from "../../utils/consts/elements.list"
 import { Element } from "./Element"
+import { elementsList } from "../../utils/consts/elements.list"
 
 export class GridCell {
+    x_index: number
+    y_index: number
     x_coord: number
     y_coord: number
     width: number
     height: number
     elements: {[index: string]: number}
-    constructor(x_coord: number, y_coord: number, width: number, height: number) {
+    constructor(x_index: number, y_index: number, x_coord: number, y_coord: number, width: number, height: number) {
+        this.x_index = x_index
+        this.y_index = y_index
         this.x_coord = x_coord
         this.y_coord = y_coord;
         this.width = width;
@@ -53,7 +57,7 @@ export class GridCell {
             newElement.coords[3] = Math.max(newElement.coords[3], this.x_coord)
         }
         newElement.positions = [newElement.coords[3], newElement.coords[0], newElement.coords[1], newElement.coords[0], newElement.coords[1], newElement.coords[2], newElement.coords[3], newElement.coords[2]]
-        console.log('1', newElement)
+        // console.log('1', newElement)
         return newElement;
     }
 
@@ -66,7 +70,7 @@ export class GridCell {
         let right = Math.min(element1.coords[1], element2.coords[1])
         let bottom = Math.min(element1.coords[2], element2.coords[2])
         let top = Math.max(element1.coords[0], element2.coords[0]);
-        console.log(element1.coords, element2.coords, top, bottom)
+        // console.log(element1.coords, element2.coords, top, bottom)
         elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), left, top, Math.min(element1.coords[3], element2.coords[3])]))
         elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), right, top, left]))
         elements.push(createElementWithCoords([top, left, bottom, Math.min(element1.coords[3], element2.coords[3])]))
@@ -80,7 +84,7 @@ export class GridCell {
     //@ToDo: допилить логику итераций
     splitAllElements(elements: Element[]): Element[] {
         let newElements: Element[] = [...elements];
-        console.log(newElements);
+        // console.log(newElements);
         for (let i = 0; i < newElements.length; i++) {
             for (let j = i + 1; j < newElements.length; j++) {
                 if (this.checkElementInsideAnotherElement(newElements[i], newElements[j]) === 1) {
@@ -100,11 +104,11 @@ export class GridCell {
                 }
                 else if (this.checkElementIsInCoords(newElements[i], newElements[j].coords[3], newElements[j].coords[0], newElements[j].coords[1], newElements[j].coords[2], false)) {
                     newElements.push(...this.splitOverlappingElements(newElements[i], newElements[j]).filter(element => element.getSize()[0] * element.getSize()[1] > 0));
-                    console.log(this.splitOverlappingElements(newElements[i], newElements[j]).map(element => element.getSize()));
-                    console.log(newElements)
+                    // console.log(this.splitOverlappingElements(newElements[i], newElements[j]).map(element => element.getSize()));
+                    // console.log(newElements)
                     newElements.splice(j, 1);
                     newElements.splice(i, 1);
-                    console.log(newElements.length)
+                    // console.log(newElements.length)
                     i=-1;
                     break;
                 }
@@ -112,13 +116,23 @@ export class GridCell {
             i++;
             k++;
         }
-        console.log(k);
+        i = 0, k=0;
+        while (i < newElements.length && k < 100) {
+            for (let j = i + 1; j < newElements.length; j++) {
+                if (this.checkElementInsideAnotherElement(newElements[i], newElements[j]) === 1) {
+                    newElements.splice(j, 1);
+                }
+            }
+            i++;
+            k++;
+        }
+        // console.log(k);
         return newElements;
     }
 
 
     getAreas(elements: Element[]): [number, number] {
-        console.log(elements);
+        console.log('1', elements);
         let elementsSized = this.splitAllElements(elements.map(element => this.resizeElementToCell(element)));
         console.log(elementsSized.map(element => element.getSize()));
         let sumElementsAreas = elementsSized.reduce((acc, element) => acc + element.getSize()[0] * element.getSize()[1], 0);
@@ -128,7 +142,8 @@ export class GridCell {
 
 
     setElementsAreas(elements: Element[]) {
-        console.log(this.x_coord, this.y_coord)
+        // console.log(this.x_coord, this.y_coord)
+        
         this.elements['Пустое пространство'] = this.getAreas(elements.filter(element => this.checkElementIsInCoords(element, this.x_coord, this.y_coord, this.width, this.height)))[1];
         elements.forEach(element => {
             if (this.checkElementIsInCoords(element, this.x_coord, this.y_coord, this.width, this.height)) {
@@ -140,4 +155,16 @@ export class GridCell {
             }
         })
     }
+
+    getAreasForLineDiagram(elements: Element[], code: string): {[name: string]: number} {
+        let areas = this.getAreas(elements.filter(element => elementsList[element.code].visible && this.checkElementIsInCoords(element, this.x_coord, this.y_coord, this.width, this.height)));
+        return {
+            [code]: areas[0],
+            'Пустое пространство': areas[1]
+        }
+    }
+
+    // getAreasForSpecificElements(elements: Element[]): {[name: string]: number} {
+    //     let filteredAreas Object.fromEntries(Object.entries(this.elements).filter(([key]) => elements.some(element => element.code === key || key === 'Пустое пространство')));
+    // }
 }

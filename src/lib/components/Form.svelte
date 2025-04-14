@@ -59,12 +59,12 @@
 						globalCell = content.global;
             canRedraw = true
 			tick().then(() => {
-				console.log(canRedraw)
+				// console.log(canRedraw)
 				canRedraw = false;
 			})
             parseError = false
         } catch (e) {
-            console.log(e)
+            // console.log(e)
             parseError = true;
         }
     }

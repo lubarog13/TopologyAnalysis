@@ -23,11 +23,11 @@
             elementEntries = Object.entries(cell.getElementsAreasPercent());
         }
 
-        console.log(elementEntries);
+        // console.log(elementEntries);
         
         if (elementEntries.length > 0) {
             new Chart(chartCanvas, {
-                type: 'pie',
+                type:    'pie',
                 data: {
                     labels: elementEntries.map(([code]) => code),
                     datasets: [{

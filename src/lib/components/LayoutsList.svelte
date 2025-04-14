@@ -7,7 +7,10 @@
     TableHead,
     TableHeadCell,
     Checkbox,
-    Tooltip
+    Tooltip,
+
+	Button
+
   } from 'flowbite-svelte';
   import { elementsList, type LayoutElement } from '../../utils/consts/elements.list';
 
@@ -16,17 +19,16 @@
   }
 
   let {onElementChange}: Props = $props();
-  let hideAll: boolean = $state(false);
 
   interface ElementItem extends LayoutElement {
     code: string
   }
-  let items: ElementItem[] = Object.keys(elementsList).map(it => {
+  let items: ElementItem[] = $state(Object.keys(elementsList).map(it => {
     return {
         code: it,
         ...elementsList[it]
     }
-  })
+  }))
 
   function castToItem(item: any): ElementItem {
     return item as ElementItem;
@@ -38,20 +40,21 @@
     onElementChange();
   }
 
-  function changeHideAll() {
-    hideAll = !hideAll;
+  function changeHideAll(value: boolean) {
     Object.keys(elementsList).forEach(item => {
-      elementsList[item].visible = !hideAll;
+      elementsList[item].visible = !value;
     });
-    items.forEach(item => {
-      item.visible = !hideAll;
+    items = items.map(item => {
+      item.visible = !value;
+      return item;
     });
     onElementChange();
   }
 </script>
 
 <div>
-  <Checkbox checked={hideAll} on:click={() => {changeHideAll()}}>Скрыть все</Checkbox>
+  <Button color="primary" class="mb-2" on:click={() => {changeHideAll(true)}}>Скрыть все</Button>
+  <Button color="primary" outline class="mb-2" on:click={() => {changeHideAll(false)}}>Показать все</Button>
 
 <Table {items} divClass="h-70 sm:h-150 max-h-[80vh] relative overflow-y-auto order-0 sm:order-1" placeholder="Поиск слоя" hoverable={true} filter={(item: ElementItem, searchTerm) => item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.code.toLowerCase().includes(searchTerm.toLowerCase())}>
     <TableHead class="sticky">
@@ -63,7 +66,7 @@
       <TableBodyRow slot="row" let:item id="layout-{castToItem(item).code}" >
         <TableBodyCell><div class="w-4 h-4" style="background: {castToItem(item).color};"></div></TableBodyCell>
         <TableBodyCell><span>{castToItem(item).code}</span> <Tooltip triggeredBy="#layout-{castToItem(item).code}">{castToItem(item).name}</Tooltip></TableBodyCell>
-        <TableBodyCell>   <Checkbox checked={castToItem(item).visible && !hideAll} on:click={() => {changeVisibilytyOfItem(castToItem(item))}} /></TableBodyCell>
+        <TableBodyCell>   <Checkbox checked={castToItem(item).visible} on:click={() => {changeVisibilytyOfItem(castToItem(item))}} /></TableBodyCell>
       </TableBodyRow>
     </TableBody>
   </Table>

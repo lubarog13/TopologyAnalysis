@@ -93,17 +93,87 @@ export class Cell {
 				}
 				if (description[i].startsWith('L') && description[i + 1]?.startsWith('P')) {
 					temp = description[i + 1].split(' ');
+					//@ToDo - если 16 коодинат - разбить на три части
 					let positions = temp.slice(1).map((it) => Number(it))
-					if (positions[0] === positions[2]) {
-						positions = [positions[0], positions[1], positions[4], positions[1], positions[4], positions[3], positions[0], positions[3]]
+					let positionsXY: number[][] = [];
+					for (let i = 0; i < positions.length; i += 2) {
+						positionsXY.push([positions[i], positions[i + 1]]);
 					}
-					let element = new Element(
-						name,
-						description[i].split(' ')[1],
-						positions,
-						layout
-					);
-					this.addElement(element);
+					if (positions.length === 8) {
+						let xMin = Math.min(...positionsXY.map((it) => it[0]));
+						let xMax = Math.max(...positionsXY.map((it) => it[0]));
+						let yMin = Math.min(...positionsXY.map((it) => it[1]));
+						let yMax = Math.max(...positionsXY.map((it) => it[1]));
+						positions = [
+							xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax
+						]
+
+						let element = new Element(
+							name,
+							description[i].split(' ')[1],
+							positions,
+							layout
+						);
+						this.addElement(element);
+					}
+					else if (positions.length === 12) {
+						let xMin = Math.min(...positionsXY.map((it) => it[0]));
+						let xMax = Math.max(...positionsXY.map((it) => it[0]));
+						let yMin = Math.min(...positionsXY.map((it) => it[1]));
+						let yMax = Math.max(...positionsXY.map((it) => it[1]));
+						let xMiddle = positionsXY.map((it) => it[0]).filter(it => it > xMin && it < xMax)[0];
+						let yMiddle = positionsXY.map((it) => it[1]).filter(it => it > yMin && it < yMax)[0];
+						let positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle, xMin, yMiddle]
+						let positions2 = [xMiddle, yMiddle, xMax, yMiddle, xMax, yMax, xMiddle, yMax]
+						let element1 = new Element(
+							name,
+							description[i].split(' ')[1],
+							positions1,
+							layout
+						);
+						this.addElement(element1);
+						let element2 = new Element(
+							name,
+							description[i].split(' ')[1],
+							positions2,
+							layout
+						);
+						this.addElement(element2);
+					}
+					else if (positions.length === 16) {
+						let xMin = Math.min(...positionsXY.map((it) => it[0]));
+						let xMax = Math.max(...positionsXY.map((it) => it[0]));
+						let yMin = Math.min(...positionsXY.map((it) => it[1]));
+						let yMax = Math.max(...positionsXY.map((it) => it[1]));
+						let xMiddle1 = Math.min(...positionsXY.map((it) => it[0]).filter(it => it > xMin && it < xMax));
+						let xMiddle2 = Math.max(...positionsXY.map((it) => it[0]).filter(it => it > xMin && it < xMax));
+						let yMiddle1 = Math.min(...positionsXY.map((it) => it[1]).filter(it => it > yMin && it < yMax));
+						let yMiddle2 = Math.max(...positionsXY.map((it) => it[1]).filter(it => it > yMin && it < yMax));
+						let positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle1, xMin, yMiddle1];
+						let positions2 = [xMin, yMiddle2, xMiddle1, yMiddle2, xMiddle1, yMax, xMin, yMax];
+						let positions3 = [xMiddle2, yMiddle2, xMax, yMiddle2, xMax, yMax, xMiddle2, yMax];
+						let element1 = new Element(
+							name,
+							description[i].split(' ')[1],
+							positions1,
+							layout
+						);
+						this.addElement(element1);
+						let element2 = new Element(
+							name,
+							description[i].split(' ')[1],
+							positions2,
+							layout
+						);
+						this.addElement(element2);
+						let element3 = new Element(
+							name,
+							description[i].split(' ')[1],
+							positions3,
+							layout
+						);
+						this.addElement(element3);
+					}
 					layout++;
 					i++;
 				}
@@ -112,6 +182,61 @@ export class Cell {
 			}
 			i++;
 		}
+	}
+
+	checkElementIsInCoords(element: Element, x_coord: number, y_coord: number, width: number, height: number, ignoreBorder = true): boolean {
+        if (ignoreBorder) {
+            const topBorderDowner = element.coords[0] > y_coord + height
+            const bottomBorderUpper = element.coords[2] < y_coord
+            const leftBorderRighter = element.coords[3] > x_coord + width
+            const rightBorderLefter = element.coords[1] < x_coord
+            return !(topBorderDowner || bottomBorderUpper || leftBorderRighter || rightBorderLefter)
+        }
+        else {
+            const topBorderDowner = element.coords[0] >= y_coord + height
+            const bottomBorderUpper = element.coords[2] <= y_coord
+            const leftBorderRighter = element.coords[3] >= x_coord + width
+            const rightBorderLefter = element.coords[1] <= x_coord
+            return !(topBorderDowner || bottomBorderUpper || leftBorderRighter || rightBorderLefter)
+        }
+    }
+
+    checkElementInsideAnotherElement(element: Element, anotherElement: Element): number {
+        if (element.coords[0] <= anotherElement.coords[0] && element.coords[1] >= anotherElement.coords[1] && element.coords[2] >= anotherElement.coords[2] && element.coords[3] <= anotherElement.coords[3]) {
+            return 1;
+        }
+        else if (element.coords[0] >= anotherElement.coords[0] && element.coords[1] <= anotherElement.coords[1] && element.coords[2] <= anotherElement.coords[2] && element.coords[3] >= anotherElement.coords[3]) {
+            return -1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+	splitOverlappingElements(element1: Element, element2: Element): Element[] {
+        let elements: Element[] = []
+        const createElementWithCoords = (coords: number[]): Element => {
+            return new Element("", "", [coords[3], coords[0], coords[1], coords[0], coords[1], coords[2], coords[3], coords[2]], 1);
+        }
+        let left = Math.max(element1.coords[3], element2.coords[3])
+        let right = Math.min(element1.coords[1], element2.coords[1])
+        let bottom = Math.min(element1.coords[2], element2.coords[2])
+        let top = Math.max(element1.coords[0], element2.coords[0]);
+        // console.log(element1.coords, element2.coords, top, bottom)
+        elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), left, top, Math.min(element1.coords[3], element2.coords[3])]))
+        elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), right, top, left]))
+        elements.push(createElementWithCoords([top, left, bottom, Math.min(element1.coords[3], element2.coords[3])]))
+        elements.push(createElementWithCoords([top, right, bottom, left]))
+        elements.push(createElementWithCoords([top, Math.max(element1.coords[1], element2.coords[1]), bottom, right]))
+        elements.push(createElementWithCoords([bottom, Math.max(element1.coords[1], element2.coords[1]), Math.max(element1.coords[2], element2.coords[2]), right]))
+        elements.push(createElementWithCoords([bottom, right, Math.max(element1.coords[2], element2.coords[2]), left]))
+        return elements;
+    }
+
+	splitAllElements(): Element[] {
+		let newElements: Element[] = [...this.elements];
+		//@ToDo: допилить по элементам
+		return newElements;
 	}
 
 	getElementsAreasPercent(): {[key: string]: number} {

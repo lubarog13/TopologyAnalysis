@@ -18,7 +18,7 @@ export const elementsList: { [index: string]: LayoutElement } = {
 		name: 'n- карман, включающий p- транзиторы',
 		color: '#b36b6b7b',
 		visible: true,
-		negative: false
+		negative: true
 	},
 	KP: {
 		name: 'Отсутствует p- карман',
@@ -84,7 +84,7 @@ export const elementsList: { [index: string]: LayoutElement } = {
 		name: 'p++ - область легирования',
 		color: '#5a5fd56b',
 		visible: true,
-		negative: false
+		negative: true
 	},
 	SI: {
 		name: 'Поликремний, в том числе закрылок транзистора',
@@ -96,13 +96,13 @@ export const elementsList: { [index: string]: LayoutElement } = {
 		name: 'Затвор n- транзитора',
 		color: '#a3e703f7',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	SP: {
 		name: 'Затвор p- транзитора',
 		color: '#03e795e2',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	SZ: {
 		name: 'Закрылок транзистора',
@@ -114,43 +114,43 @@ export const elementsList: { [index: string]: LayoutElement } = {
 		name: 'Контактное окно между М1C_ и NA_',
 		color: '#ff1212ff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	CNK: {
 		name: 'Контактное окно между М1C_ и NK_',
 		color: '#870303ff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	CNE: {
 		name: 'Контактное окно между М1C_ и NE_',
 		color: '#690202ff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	CPA: {
 		name: 'Контактное окно между М1C_ и PA_',
 		color: '#0275dfff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	CPK: {
 		name: 'Контактное окно между М1C_ и PK_',
 		color: '#2569a8ff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	CPE: {
 		name: 'Контактное окно между М1C_ и PE_',
 		color: '#8225a8ff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	CSI: {
 		name: 'Контактное окно между M1C_ и SI_',
 		color: '#09b706ff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	M1: {
 		name: 'Металл нижний',
@@ -174,7 +174,7 @@ export const elementsList: { [index: string]: LayoutElement } = {
 		name: 'Контактное окно между М2C_ и M1C_',
 		color: '#c0aceeff',
 		visible: true,
-		negative: true
+		negative: false
 	},
 	M2: {
 		name: 'Металл верхний',
