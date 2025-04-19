@@ -1,7 +1,7 @@
 <Navbar rounded color="primary">
   <div class="flex flex-row gap-4"> 
     <NavBrand href="/">
-      <img src="/images/tutorial.svg" class="me-3 h-6 sm:h-9" alt="Логотип" />
+      <img src="/images/chip.png" class="me-3 h-6 sm:h-9" alt="Логотип" />
       <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Анализ интегральной схемы</span>
     </NavBrand>
     <DarkMode />

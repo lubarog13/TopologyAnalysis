@@ -9,7 +9,6 @@
         cells: GridCell[],
         count: number,
         selectedElements: Element[],
-        color: string,
         style: string,
         className: string
     }
@@ -17,15 +16,18 @@
         column: number,
         areas: {[name: string]: number}
     }
-    let {direction, cells, count, selectedElements, color, style, className}: Props = $props();
+    let {direction, cells, count, selectedElements, style, className}: Props = $props();
 
     let diagramItems: DiagramItem[] = $state([]);
     let size: number = $state(0);
+    let selectedColor: string = $state('');
     let codes: string[] = $state([]);
     let tooltipText: string = $state('');
+    let tooltipTextFormatted: string = $derived(tooltipText.length > 100? tooltipText.slice(0, 100) + '...' : tooltipText);
     onMount(() => {
-        console.log(selectedElements)
-        tooltipText = Array.from(new Set(selectedElements.filter(element => elementsList[element.code].visible).map(element => element.code))).join(' + ');
+        // console.log(selectedElements)
+        let elementCodes = Array.from(new Set(selectedElements.filter(element => elementsList[element.code].is_selected).map(element => element.code)));
+        tooltipText = elementCodes.join(' + ');
         for (let i = 0; i < count; i++) {
             diagramItems.push({column: i, areas: {}})
             diagramItems[i].areas[tooltipText] = 0;
@@ -34,7 +36,7 @@
 
         for (let i = 0; i < count; i++) {
             let cellsInDirection = cells.filter(cell => direction === 'column' ? cell.y_index === i : cell.x_index === i);
-            console.log(cellsInDirection)
+            // console.log(cellsInDirection)
             cellsInDirection.forEach(cell => {
                 Object.entries(cell.getAreasForLineDiagram(selectedElements, tooltipText)).forEach(([code, area]) => {
                     diagramItems[i].areas[code] += area;
@@ -46,9 +48,10 @@
                 diagramItems[i].areas[code] = (area / totalArea) * 100;
             });
         }
+        selectedColor = elementCodes.length > 0 ? elementsList[elementCodes[0]].color : '';
         size = direction === 'column' ? document.getElementsByClassName('element-table')[0].clientHeight : document.getElementsByClassName('element-table')[0].clientWidth;
         codes = direction==='column'? Object.keys(diagramItems[0].areas).sort() : Object.keys(diagramItems[0].areas).sort().reverse();
-        console.log(diagramItems)
+        // console.log(diagramItems)
 
     })
 </script>
@@ -57,10 +60,10 @@
     {#each diagramItems as item}
         <div class="diagram-line__item" style="display: flex; flex-direction: {direction === 'column' ? 'row' : 'column'}; width: {direction === 'column' ? '50px' : '100%'}; height: {direction === 'column' ? '100%' : '50px'};">
             {#each codes as code}
-                <div class="diagram-line__item-area" style="width: {direction==='column'? item.areas[code]+'%': '100%'}; height: {direction==='column'? '100%': item.areas[code]+'%'}; background-color: {code === 'Пустое пространство' ? 'var(--color-gray-200)' : color};"></div>
+                <div class="diagram-line__item-area" style="width: {direction==='column'? item.areas[code]+'%': '100%'}; height: {direction==='column'? '100%': item.areas[code]+'%'}; background-color: {code === 'Пустое пространство' ? 'var(--color-gray-200)' : selectedColor};"></div>
             {/each}
         </div>
     {/each}
 </div>
-    <Tooltip triggeredBy="#diagram-line-{direction}">{tooltipText}</Tooltip>
+    <Tooltip triggeredBy="#diagram-line-{direction}">{tooltipTextFormatted}</Tooltip>
         

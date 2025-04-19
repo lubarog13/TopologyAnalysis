@@ -4,7 +4,7 @@
 	import { parseCif, parseCifV2 } from '../../utils/consts/methods';
   import { InfoCircleSolid } from 'flowbite-svelte-icons';
 	import type { Cell } from '$lib/classes/Cell';
-	import {tick} from "svelte";
+	import {onDestroy, onMount, tick} from "svelte";
 	import CellDiagram from './CellDiagram.svelte';
 	import type { GridCell } from '$lib/classes/GridCell';
   const fileuploadprops = {
@@ -24,6 +24,7 @@
 	let globalCell = $state<Cell|undefined>();
 	let selectedCell = $state<Cell | GridCell | null>(null);
 	let showDiagram: boolean = $state(false);
+
 	function handleFileChange(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (input.files && input.files.length > 0) {
@@ -57,18 +58,23 @@
 						let content = parseCifV2(topology);
 						cells = content.cells;
 						globalCell = content.global;
-            canRedraw = true
-			tick().then(() => {
-				// console.log(canRedraw)
-				canRedraw = false;
-			})
-            parseError = false
+						canRedraw = true;
+		tick().then(() => {
+			canRedraw = false;
+		})
+						parseError = false
         } catch (e) {
             // console.log(e)
             parseError = true;
         }
     }
 	}
+
+	function redrawContent() {
+		canRedraw = true;
+	}
+
+
 
 	function onCellSelected(cell: Cell | GridCell | null) {
 		showDiagram = false;
@@ -79,6 +85,20 @@
 			}, 100);
 		}
 	}
+
+
+	onMount(() => {
+		if (typeof window !== 'undefined') {
+			window.addEventListener('resize', redrawContent);
+		}
+	})
+
+	onDestroy(() => {
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('resize', redrawContent);
+		}
+	})
+
 </script>
 
 <div

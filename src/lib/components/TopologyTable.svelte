@@ -30,6 +30,7 @@
 	let customGridCols: number = $state(10);
 	let maxGridRows: number = $state(30);
 	let maxGridCols: number = $state(30);
+	let firstDraw = true;
 
 	onMount(() => {
 		canvas = document.getElementById('topology-table-canvas') as HTMLCanvasElement;
@@ -116,6 +117,10 @@
 				maxGridRows = Math.floor(canvas.width / 2);
 				maxGridCols = Math.floor(canvas.height / 2);
 				drawComplete = true;
+				if (firstDraw) {
+					firstDraw = false;
+					showCustomGrid = true;
+				}
 			}
 	}
 
@@ -129,6 +134,9 @@
 
 	const changeGrid = debounce((row: number, col: number) => {
 		gridChanged = true;
+		if ((customGridRows > 30 || customGridCols > 30) && (customGridRows !== row || customGridCols !== col)) {
+			showCustomGrid = false;
+		}
 		customGridRows = row;
 		customGridCols = col;
 		selectedCell = null;
@@ -142,21 +150,28 @@
 	function setGridCells(cells: GridCell[]) {
 		gridCells = cells;
 	}
+
+	function chengeGridShow() 
+	{
+		gridChanged = true;
+		showCustomGrid = !showCustomGrid;
+		setTimeout(() => {
+			gridChanged = false;
+		}, 100);
+	}
 </script>	
 
 <div
-	class="topology grid w-full grid-cols-1 gap-10 sm:col-span-2 sm:grid-cols-[minmax(0,_1fr)_350px]"
+	class="topology grid w-full grid-cols-1 gap-10 sm:col-span-2 sm:grid-cols-[minmax(0,_1fr)_400px]"
 >
 	<div class="w-full mt-10 sm:mt-0">
 		{#if drawComplete}
 		<div class="flex flex-col gap-2">
-		<Checkbox class="mr-2" checked={showCustomGrid} on:change={() => {showCustomGrid=!showCustomGrid}}>Показать сетку</Checkbox>
-		{#if showCustomGrid}
+		<Checkbox class="mr-2" checked={showCustomGrid} on:change={chengeGridShow}>Показать сетку</Checkbox>
 		<Label>Количество колонок: <span class="font-bold text-red-500">{customGridCols}</span></Label>
 		<Range id="range-cols" min="1" max={maxGridCols} value={customGridCols} on:change={(event) => changeGrid(customGridRows, Number((event.target as HTMLTextAreaElement).value)||1)}/>
 		<Label>Количество строк: <span class="font-bold text-red-500">{customGridRows}</span></Label>
 		<Range id="range-rows" min="1" max={maxGridRows} value={customGridRows} on:change={(event) => changeGrid(Number((event.target as HTMLTextAreaElement).value)||1, customGridCols)}/>
-		{/if}
 		</div>
 		{/if}
 		<div class="grid grid-cols-2 gap-1 grid-cols-[50px_minmax(0,_1fr)]">
@@ -195,21 +210,21 @@
 					{/each}
 				</div>
 			</div>
-			{#if showCustomGrid && !gridChanged}
+			{#if !gridChanged}
 			<GridLayout elements={elements} cellsCountCols={customGridCols} cellsCountRows={customGridRows} width={canvas.width} height={canvas.height} onCellSelected={(cell) => {
 				selectedCell = cell;
 				onCellSelected(cell);
-			}} setGridCells={setGridCells}></GridLayout>
+			}} setGridCells={setGridCells} showGrid={showCustomGrid}></GridLayout>
 			{/if}
 		{/if}
 	</div>
 	{#if gridCells.length > 0}
 	<div></div>
-	<DiagramLine className="" style="" direction="row" cells={gridCells} count={customGridCols} selectedElements={elements} color="var(--color-primary-700)" />
+	<DiagramLine className="" style="" direction="row" cells={gridCells} count={customGridCols} selectedElements={elements}  />
 	{/if}
 	</div>
 	</div>
-	<LayoutsList onElementChange={redraw} />
+	<LayoutsList onElementChange={redraw} onDiagramChange={() => {changeGrid(customGridRows, customGridCols)}} />
 </div>
 
 <style>

@@ -7,7 +7,7 @@
   
   <Footer footerType="logo">
     <div class="sm:flex sm:items-center sm:justify-between">
-      <FooterBrand href="https://example.com" src="/images/tutorial.svg" alt="Логотип" />
+      <FooterBrand href="https://example.com" src="/images/chip.png" alt="Логотип" />
       <FooterLinkGroup ulClass="flex flex-wrap items-center mb-6 text-sm text-gray-500 sm:mb-0 dark:text-gray-400">
         <FooterLink href="/about">О программе</FooterLink>
       <FooterLink href="/agreement">Соглашение</FooterLink>

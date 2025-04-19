@@ -16,9 +16,10 @@
 
   interface Props {
     onElementChange: () => void,
+    onDiagramChange: () => void,
   }
 
-  let {onElementChange}: Props = $props();
+  let {onElementChange, onDiagramChange}: Props = $props();
 
   interface ElementItem extends LayoutElement {
     code: string
@@ -37,18 +38,33 @@
   function changeVisibilytyOfItem(item: ElementItem) {
     item.visible = !item.visible;
     elementsList[item.code].visible = item.visible;
+    if (!item.visible) {
+      item.is_selected = false;
+      elementsList[item.code].is_selected = false;
+      onDiagramChange();
+    }
     onElementChange();
+  }
+
+  function changeIsSelectedOfItem(item: ElementItem) {
+    item.is_selected = !item.is_selected;
+    elementsList[item.code].is_selected = item.is_selected;
+    onElementChange();
+    onDiagramChange();
   }
 
   function changeHideAll(value: boolean) {
     Object.keys(elementsList).forEach(item => {
       elementsList[item].visible = !value;
+      elementsList[item].is_selected = false;
     });
     items = items.map(item => {
       item.visible = !value;
+      item.is_selected = false;
       return item;
     });
     onElementChange();
+    onDiagramChange();
   }
 </script>
 
@@ -61,12 +77,14 @@
       <TableHeadCell>Цвет</TableHeadCell>
       <TableHeadCell>Код</TableHeadCell>
       <TableHeadCell>Видимость</TableHeadCell>
+      <TableHeadCell>На диаграмме</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y overflow-y-auto">
       <TableBodyRow slot="row" let:item id="layout-{castToItem(item).code}" >
         <TableBodyCell><div class="w-4 h-4" style="background: {castToItem(item).color};"></div></TableBodyCell>
         <TableBodyCell><span>{castToItem(item).code}</span> <Tooltip triggeredBy="#layout-{castToItem(item).code}">{castToItem(item).name}</Tooltip></TableBodyCell>
         <TableBodyCell>   <Checkbox checked={castToItem(item).visible} on:click={() => {changeVisibilytyOfItem(castToItem(item))}} /></TableBodyCell>
+        <TableBodyCell>   <Checkbox checked={castToItem(item).is_selected} on:click={() => {changeIsSelectedOfItem(castToItem(item))}} /></TableBodyCell>
       </TableBodyRow>
     </TableBody>
   </Table>
