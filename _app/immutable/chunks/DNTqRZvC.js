@@ -1,0 +1,1 @@
+import{z as t,J as c,i,af as s,o as _,q as l,P as p}from"./CrbX4yXL.js";function d(r,n,f){t&&c();var o=r,e,a;i(()=>{e!==(e=n())&&(a&&(l(a),a=null),e&&(a=_(()=>f(o,e))))},s),t&&(o=p)}const b=Object.freeze(Object.defineProperty({__proto__:null},Symbol.toStringTag,{value:"Module"}));export{b as _,d as c};
