@@ -66,11 +66,24 @@
     onElementChange();
     onDiagramChange();
   }
+
+  function showAllOnDiagram() {
+    Object.keys(elementsList).forEach(item => {
+      elementsList[item].is_selected = true;
+    });
+    items = items.map(item => {
+      item.is_selected = true;
+      return item;
+    });
+    onElementChange();
+    onDiagramChange();
+  }
 </script>
 
 <div>
   <Button color="primary" class="mb-2" on:click={() => {changeHideAll(true)}}>Скрыть все</Button>
   <Button color="primary" outline class="mb-2" on:click={() => {changeHideAll(false)}}>Показать все</Button>
+  <Button color="primary" outline class="mb-2" on:click={() => {showAllOnDiagram()}}>Показать все на диаграмме</Button>
 
 <Table {items} divClass="h-70 sm:h-150 max-h-[80vh] relative overflow-y-auto order-0 sm:order-1" placeholder="Поиск слоя" hoverable={true} filter={(item: ElementItem, searchTerm) => item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.code.toLowerCase().includes(searchTerm.toLowerCase())}>
     <TableHead class="sticky">

@@ -57,10 +57,13 @@
 </script>
 
 <div id="diagram-line-{direction}" class="diagram-line grid {className}" style="{style} {direction === 'column' ? 'grid-template-rows' : 'grid-template-columns'}: repeat({count}, 1fr); {direction === 'column' ? 'height' : 'width'}: {size}px;">
-    {#each diagramItems as item}
+    {#each diagramItems as item, index1}
         <div class="diagram-line__item" style="display: flex; flex-direction: {direction === 'column' ? 'row' : 'column'}; width: {direction === 'column' ? '50px' : '100%'}; height: {direction === 'column' ? '100%' : '50px'};">
-            {#each codes as code}
-                <div class="diagram-line__item-area" style="width: {direction==='column'? item.areas[code]+'%': '100%'}; height: {direction==='column'? '100%': item.areas[code]+'%'}; background-color: {code === 'Пустое пространство' ? 'var(--color-gray-200)' : selectedColor};"></div>
+            {#each codes as code, index2}
+                <div class="diagram-line__item-area" id="diagram-line__item-area-{direction}-{index1}-{index2}" style="width: {direction==='column'? item.areas[code]+'%': '100%'}; height: {direction==='column'? '100%': item.areas[code]+'%'}; background-color: {code === 'Пустое пространство' ? 'var(--color-gray-200)' : selectedColor};"></div>
+               {#if code !== 'Пустое пространство'}
+                    <Tooltip triggeredBy="#diagram-line__item-area-{direction}-{index1}-{index2}" placement="{direction === 'column' ? 'left' : 'bottom'}">{item.areas[code].toFixed(2)}%</Tooltip>
+               {/if}
             {/each}
         </div>
     {/each}

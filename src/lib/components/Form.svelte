@@ -7,6 +7,7 @@
 	import {onDestroy, onMount, tick} from "svelte";
 	import CellDiagram from './CellDiagram.svelte';
 	import type { GridCell } from '$lib/classes/GridCell';
+	import debounce from 'debounce';
   const fileuploadprops = {
 		id: 'fileupload',
 		label: 'Upload file',
@@ -70,9 +71,9 @@
     }
 	}
 
-	function redrawContent() {
+	const redrawContent = debounce(() => {
 		canRedraw = true;
-	}
+	}, 100)
 
 
 

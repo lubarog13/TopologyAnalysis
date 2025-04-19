@@ -96,7 +96,7 @@ export class GridCell {
             }
         }
         newElements.push(currentElement)
-        console.log('7', newElements)
+        // console.log('7', newElements)
         return newElements;
     }
 
@@ -123,7 +123,7 @@ export class GridCell {
         x_coords.push(...elements.map(element => element.coords[1]));
         x_coords = Array.from(new Set(x_coords));
         x_coords.sort((a, b) => a - b);
-        console.log(x_coords)
+        // console.log(x_coords)
         let removeDuplicates = (elements: Element[]) => {
             let i = 0, k=0;
             while (i < elements.length && k < 100) {
@@ -142,7 +142,7 @@ export class GridCell {
         }
         removeDuplicates(elementsCopy)
         let n = elementsCopy.length;
-        console.log('6', elementsCopy)
+        // console.log('6', elementsCopy)
         for (let j=0; j<n; j++) {
             newElements.push(...this.splitElementByXCoords(elementsCopy[j], x_coords))
         }
@@ -180,7 +180,6 @@ export class GridCell {
         return elements;
     }
 
-    //@ToDo: допилить логику итераций
     splitAllElements(elements: Element[]): Element[] {
         let newElements: Element[] = [...elements];
         // console.log(newElements);
@@ -235,12 +234,12 @@ export class GridCell {
 
 
     getAreas(elements: Element[]): [number, number] {
-        console.log('1', elements);
-        console.log('2', elements.map(element => this.resizeElementToCell(element)));
-        console.log(this.x_coord, this.y_coord, this.width, this.height)
+        // console.log('1', elements);
+        // console.log('2', elements.map(element => this.resizeElementToCell(element)));
+        // console.log(this.x_coord, this.y_coord, this.width, this.height)
         let elementsSized = this.splitOverlappingElementsNew(elements.map(element => this.resizeElementToCell(element)));
-        console.log('3', elementsSized);
-        console.log(elementsSized.map(element => element.getSize()));
+        // console.log('3', elementsSized);
+        // console.log(elementsSized.map(element => element.getSize()));
         let sumElementsAreas = elementsSized.reduce((acc, element) => acc + element.getSize()[0] * element.getSize()[1], 0);
         let emptySpaceArea = this.width * this.height - sumElementsAreas;
         return [sumElementsAreas, emptySpaceArea];

@@ -87,6 +87,8 @@
 				ctx.globalAlpha = 1;
 				cells.forEach((cell) => cell.draw(ctx));
 				let container = document.getElementById('topology-table-container') as HTMLElement;
+				container.style.width = 'initial';
+				container.style.height = 'initial';
 				const scaleX = (container?.clientWidth || 0) / canvas.width;
 				const scaleY = (container?.clientHeight || 0) / canvas.height;
 
