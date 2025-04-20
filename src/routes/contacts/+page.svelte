@@ -1,10 +1,11 @@
 <script>
     import { Breadcrumb, BreadcrumbItem, Heading, Card, P, A } from 'flowbite-svelte';
+    import { base } from '$app/paths';
 </script>
 <div class="container mx-auto py-4 min-h-200">
     <Breadcrumb>
-        <BreadcrumbItem href="/" home>Главная</BreadcrumbItem>
-        <BreadcrumbItem href="/contacts">Контакты</BreadcrumbItem>
+        <BreadcrumbItem href={base + '/'} home>Главная</BreadcrumbItem>
+        <BreadcrumbItem href={base + '/contacts'}>Контакты</BreadcrumbItem>
     </Breadcrumb>
     <Heading tag="h1" class="mb-6 mt-4">Контакты</Heading>
     <P class="mb-6 mt-4 text-lg">
@@ -60,6 +61,6 @@
           </figcaption>
         </figure>
       </Card>
-      <img src="/images/virtual-assistant-concept.png" alt="Контакты" class="w-full h-full object-cover max-w-[300px] mx-auto lg:max-w-none order-0 lg:order-1">
+      <img src={base + '/images/virtual-assistant-concept.png'} alt="Контакты" class="w-full h-full object-cover max-w-[300px] mx-auto lg:max-w-none order-0 lg:order-1">
     </div>
 </div>

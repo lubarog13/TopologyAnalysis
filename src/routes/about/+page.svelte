@@ -1,11 +1,11 @@
 <script>
 	import { Heading, Breadcrumb, BreadcrumbItem, P, Alert, List, Li } from "flowbite-svelte";
-
+    import { base } from "$app/paths";
 </script>
 <div class="container mx-auto py-4 min-h-200">
     <Breadcrumb>
-        <BreadcrumbItem href="/" home>Главная</BreadcrumbItem>
-        <BreadcrumbItem href="/about">О программе</BreadcrumbItem>
+        <BreadcrumbItem href={base + '/'} home>Главная</BreadcrumbItem>
+        <BreadcrumbItem href={base + '/about'}>О программе</BreadcrumbItem>
     </Breadcrumb>
     <Heading tag="h1" class="mb-6 mt-8">О программе</Heading>
     <P>

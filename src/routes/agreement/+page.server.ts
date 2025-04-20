@@ -1,4 +1,5 @@
-import { redirect } from "@sveltejs/kit";
-export function load() {
-    redirect(307, '/?action=agreement');
-}
+// import { redirect } from "@sveltejs/kit";
+// import { base } from "$app/paths";
+// export function load() {
+//     redirect(307, base + '/?action=agreement');
+// }
