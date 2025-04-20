@@ -1,1 +1,0 @@
-import{i as r,j as c,k as i,E as s,q as h,u as p,v as u}from"./B_4l-tK2.js";function m(t,f,o){r&&c();var n=t,a,e;i(()=>{a!==(a=f())&&(e&&(p(e),e=null),a&&(e=h(()=>o(n,a))))},s),r&&(n=u)}export{m as c};
