@@ -1,0 +1,1 @@
+import{k as r,o as c,q as s,E as i,u as h,v as p,w as u}from"./DbSMHgCf.js";function m(o,t,f){r&&c();var n=o,a,e;s(()=>{a!==(a=t())&&(e&&(p(e),e=null),a&&(e=h(()=>f(n,a))))},i),r&&(n=u)}export{m as c};
