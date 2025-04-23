@@ -1,5 +1,5 @@
 <script>
-	import { Heading, Breadcrumb, BreadcrumbItem, P, Alert, List, Li } from "flowbite-svelte";
+	import { Heading, Breadcrumb, BreadcrumbItem, P, Alert, List, Li, A } from "flowbite-svelte";
     import { base } from "$app/paths";
 </script>
 <div class="container mx-auto py-4 min-h-200">
@@ -13,6 +13,17 @@
         передаваемой пользователем в формате <code>.cif</code> или <code>.txt</code>. Для составления интегральной схемы воспользуйтесь одной из систем проектирования
         (TopDesign, ...).
     </P>
+    <P class="mt-4 mb-2">
+        <u class="underline">Примеры файлов:</u>
+    </P>
+    <List tag="ul" class="space-y-1">
+        <Li><A href={base + 'files/examples/sum.cif'}>sum.cif</A></Li>
+        <Li><A href={base + 'files/examples/BC.cif'}>BC.cif</A></Li>
+        <Li><A href={base + 'files/examples/RTC1.cif'}>RTC1.cif</A></Li>
+        <Li><A href={base + 'files/examples/RTC2.cif'}>RTC2.cif</A></Li>
+        <Li><A href={base + 'files/examples/RBC1.cif'}>RBC1.cif</A></Li>
+        <Li><A href={base + 'files/examples/RBC2.cif'}>RBC2.cif</A></Li>
+    </List>
     <Alert class="my-4" color="red">Внимание! данная программа не предназначена для проектирования схем, а только для анализа существующих.</Alert>
 <P>
     Данная проект представляет собой программу, выводящую на диаграмме заполненность ячеек СБИС элементами, а также количество пустого пространства, с целью оптимизации использования места.

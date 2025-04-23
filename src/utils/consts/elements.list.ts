@@ -205,6 +205,13 @@ export const elementsList: { [index: string]: LayoutElement } = {
 		negative: false,
 		is_selected: true
 	},
+	CM1: {
+		name: 'Отсутствует контактное окно между М2C_ и M1C_',
+		color: '#c0aceeff',
+		visible: true,
+		negative: false,
+		is_selected: true
+	},
 	M2: {
 		name: 'Металл верхний',
 		color: '#daa24f66',

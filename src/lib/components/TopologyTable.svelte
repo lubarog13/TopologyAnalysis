@@ -5,7 +5,7 @@
 	import type {GridCell} from "$lib/classes/GridCell";
 	import GridLayout from "$lib/components/GridLayout.svelte";
 	import type {Element} from "$lib/classes/Element";
-	import {Checkbox, Dropdown, DropdownItem, Label, Range} from "flowbite-svelte";
+	import {Checkbox, Dropdown, DropdownItem, Label, Range, Spinner} from "flowbite-svelte";
 	import { ChevronDownOutline } from 'flowbite-svelte-icons';
 	import debounce from 'debounce';
 	import DiagramLine from '$lib/components/DiagramLine.svelte';
@@ -28,10 +28,12 @@
 	let gridChanged: boolean = $state(false);
 	let customGridRows: number = $state(10);
 	let customGridCols: number = $state(10);
-	let maxGridRows: number = $state(30);
-	let maxGridCols: number = $state(30);
+	let maxGridRows: number = $state(300);
+	let maxGridCols: number = $state(300);
 	let firstDraw = true;
-
+	let isLoading = $state(false);
+	let startTime: number = $state(0);
+	let endTime: number = $state(0);
 	onMount(() => {
 		canvas = document.getElementById('topology-table-canvas') as HTMLCanvasElement;
 		ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -41,6 +43,8 @@
 	});
 	function redraw() {
 			drawComplete = false;
+			isLoading = true;
+			startTime = performance.now();
 			if (ctx) {
 				// Store the current transformation matrix
 				ctx.save();
@@ -53,10 +57,31 @@
 				ctx.restore();
 				redrawComplete();
 			}
-			if (cells.length && ctx) {
+			if ((globalCell || cells.length) && ctx) {
+				let penaltyX = 0;
+				let penaltyY = 0;
+				let maxSize = 0;
+				let maxSizeY = 0;
+				if (globalCell) {
+					let minX = Math.min(...globalCell.elements.map((element) => element.coords[0]));
+					let minY = Math.min(...globalCell.elements.map((element) => element.coords[1]));
+					if (minX < 0) {
+						penaltyX = minX;
+					}
+					if (minY < 0) {
+						penaltyY = minY;
+					}
+					console.log(penaltyX, penaltyY);
+					globalCell.setPenaltyX(penaltyX);
+					globalCell.setPenaltyY(penaltyY);
+					maxSize = Math.max(...globalCell.elements.map((element) => element.coords[3] + element.getSize()[0]));
+					maxSizeY = Math.max(...globalCell.elements.map((element) => element.coords[0] + element.getSize()[1]));
+				}
 				ctx.fillStyle = 'white';
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				cells.forEach((cell) => {
+					cell.setPenaltyX(penaltyX);
+					cell.setPenaltyY(penaltyY);
 					if (cell.elements.length > 0) {
 						cell.setWidth(Math.max(...cell.elements.map((element) => element.getSize()[0])));
 						cell.setHeight(Math.max(...cell.elements.map((element) => element.getSize()[1])));
@@ -64,19 +89,21 @@
 					}
 				});
 				let maxX = Math.max(...cells.map((cell) => cell.x_coord));
-				let maxSize = Math.max(
+				maxSize = Math.max(maxSize, Math.max(
 						...cells.filter((cell) => cell.x_coord === maxX).map((cell) => cell.width)
-				);
-				canvas.width = maxX + maxSize / 2;
+				) / 2 + maxX);
+				canvas.width = maxSize;
 				// console.log(maxSize);
 				let maxY = Math.max(...cells.map((cell) => cell.y_coord));
-				let maxSizeY = Math.max(
+				maxSizeY = Math.max(maxSizeY, Math.max(
 						...cells.filter((cell) => cell.y_coord === maxY).map((cell) => cell.height)
-				);
-				canvas.height = maxY + maxSizeY / 2;
+				) / 2 + maxY);
+				canvas.height = maxSizeY;
+				console.log(maxSize, maxSizeY)
 				// console.log(maxSizeY);
 				if (globalCell) {
 					ctx.globalAlpha = 0.3;
+
 					globalCell.setWidth(canvas.width);
 					globalCell.setHeight(canvas.height);
 					// globalCell.setCoords(canvas.width / 2, canvas.height / 2);
@@ -85,7 +112,9 @@
 				}
 
 				ctx.globalAlpha = 1;
-				cells.forEach((cell) => cell.draw(ctx));
+				cells.forEach((cell) => {
+					cell.draw(ctx);
+				});
 				let container = document.getElementById('topology-table-container') as HTMLElement;
 				container.style.width = 'initial';
 				container.style.height = 'initial';
@@ -109,6 +138,7 @@
 				if (globalCell) {
 					elements = [...elements, ...globalCell.elements];
 				}
+				console.log('elements', elements.filter(element => isNaN(element.getSize()[0]) || isNaN(element.getSize()[1])))
 				for (let i = 0; i < elements.length; i++) {
 					for (let j = i + 1; j < elements.length; j++) {
 						if (elements[i].name === elements[j].name && elements[i].positions.length === elements[j].positions.length && elements[i].positions.every(function(value, index) { return value === elements[j].positions[index]})) {
@@ -116,13 +146,21 @@
 						}
 					}
 				}
-				maxGridRows = Math.floor(canvas.width / 2);
-				maxGridCols = Math.floor(canvas.height / 2);
 				drawComplete = true;
 				if (firstDraw) {
 					firstDraw = false;
 					showCustomGrid = true;
 				}
+			}
+			isLoading = false;
+			endTime = performance.now();
+			if (endTime - startTime > 7000) {
+				maxGridRows = 30;
+				maxGridCols = 30;
+			}
+			if (endTime - startTime > 5000) {
+				maxGridRows = 100;
+				maxGridCols = 100;
 			}
 	}
 
@@ -227,6 +265,11 @@
 	</div>
 	</div>
 	<LayoutsList onElementChange={redraw} onDiagramChange={() => {changeGrid(customGridRows, customGridCols)}} />
+	{#if isLoading}
+		<div class="w-full h-full absolute top-0 left-0 flex justify-center items-center bg-white/50">
+			<Spinner />
+		</div>
+	{/if}
 </div>
 
 <style>

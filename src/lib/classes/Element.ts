@@ -51,6 +51,32 @@ export class Element {
           this.cellX + (this.positions[0]) * this.cellX_k]
     }
 
+    setPenaltyX(penaltyX: number) {
+        if (this.cellX === 0) {
+            this.positions[0] += penaltyX;
+            this.positions[2] += penaltyX;
+            this.positions[4] += penaltyX;
+            this.positions[6] += penaltyX;
+            this.setCoords();
+        } else {
+            this.cellX += penaltyX;
+            this.setCoords();
+        }
+    }
+
+    setPenaltyY(penaltyY: number) {
+        if (this.cellY === 0) {
+            this.positions[1] += penaltyY;
+            this.positions[3] += penaltyY;
+            this.positions[5] += penaltyY;
+            this.positions[7] += penaltyY;
+            this.setCoords();
+        } else {
+            this.cellY += penaltyY;
+            this.setCoords();
+        }
+    }
+
     getSize(): [number, number] {
         return [(this.positions[2] - this.positions[0]) * this.cellX_k, (this.positions[5] - this.positions[1]) * this.cellY_k];
     }

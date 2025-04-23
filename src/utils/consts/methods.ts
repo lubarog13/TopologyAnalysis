@@ -91,6 +91,13 @@ export function parseCif(cif: string) : Array<Cell> {
    });
 }
 
+
+/* @ToDo: 
+  - Подогнать под отрицательные координаты
+  - Проверить построение (разбиение) подковок
+  - Сделать дискретность, чтобы не вис процессор
+
+*/
 export function parseCifV2(cif: string): CellsContent {
   let cifArray = cif.split(/;|\n/).filter(line => line.trim() !== '');
   let cells = [] as Array<Cell>;
@@ -143,6 +150,8 @@ export function parseCifV2(cif: string): CellsContent {
   if (!globalCell) {
     globalCell = new Cell(0, 0, 0);
   }
+  console.log(cells)
+  console.log(globalCell)
   return {cells: cells.sort((a, b) => {
     if (a.x_coord > b.x_coord && a.y_coord > b.y_coord) return 1;
     if (a.x_coord > b.x_coord && a.y_coord < b.y_coord) return -1;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Fileupload, Helper, Label, Textarea, Button, Alert } from 'flowbite-svelte';
+	import { Fileupload, Helper, Label, Textarea, Button, Alert, Spinner } from 'flowbite-svelte';
 	import TopologyTable from './TopologyTable.svelte';
 	import { parseCif, parseCifV2 } from '../../utils/consts/methods';
   import { InfoCircleSolid } from 'flowbite-svelte-icons';
@@ -25,7 +25,7 @@
 	let globalCell = $state<Cell|undefined>();
 	let selectedCell = $state<Cell | GridCell | null>(null);
 	let showDiagram: boolean = $state(false);
-
+	let isLoading = $state(false);
 	function handleFileChange(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (input.files && input.files.length > 0) {
@@ -43,6 +43,7 @@
 	}
 
 	function parseFileText() {
+		isLoading = true;
 		if (file) {
 			const reader = new FileReader();
 			reader.readAsText(file);
@@ -51,6 +52,7 @@
 				topology = text;
 			};
 		}
+		isLoading = false;
 	}
 
 	function submitForm() {
@@ -65,7 +67,7 @@
 		})
 						parseError = false
         } catch (e) {
-            // console.log(e)
+            console.log(e)
             parseError = true;
         }
     }
@@ -134,4 +136,9 @@
 		</div>
 		<TopologyTable cells={cells} canRedraw={canRedraw} globalCell={globalCell} redrawComplete={() => {canRedraw = false}} onCellSelected={onCellSelected} />
 	</div>
+	{#if isLoading}
+		<div class="w-full h-full absolute top-0 left-0 flex justify-center items-center bg-white/50">
+			<Spinner />
+		</div>
+	{/if}
 </div>

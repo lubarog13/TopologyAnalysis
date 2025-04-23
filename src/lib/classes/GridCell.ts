@@ -119,6 +119,7 @@ export class GridCell {
     splitOverlappingElementsNew(elements: Element[]): Element[] {
         let newElements: Element[] = []
         let elementsCopy = [...elements]
+        // console.log('elementsCopy', elementsCopy.filter(element => isNaN(element.getSize()[0]) || isNaN(element.getSize()[1])))
         let x_coords = elements.map(element => element.coords[3]);
         x_coords.push(...elements.map(element => element.coords[1]));
         x_coords = Array.from(new Set(x_coords));
@@ -241,6 +242,8 @@ export class GridCell {
         // console.log('3', elementsSized);
         // console.log(elementsSized.map(element => element.getSize()));
         let sumElementsAreas = elementsSized.reduce((acc, element) => acc + element.getSize()[0] * element.getSize()[1], 0);
+        // console.log('elementsSized', elementsSized.filter(element => isNaN(element.getSize()[0]) || isNaN(element.getSize()[1])))
+        // console.log('sumElementsAreas', sumElementsAreas)
         let emptySpaceArea = this.width * this.height - sumElementsAreas;
         return [sumElementsAreas, emptySpaceArea];
     }
@@ -263,6 +266,7 @@ export class GridCell {
 
     getAreasForLineDiagram(elements: Element[], code: string): {[name: string]: number} {
         let areas = this.getAreas(elements.filter(element => elementsList[element.code].is_selected && this.checkElementIsInCoords(element, this.x_coord, this.y_coord, this.width, this.height)));
+        // console.log('areas', areas)
         return {
             [code]: areas[0],
             'Пустое пространство': areas[1]

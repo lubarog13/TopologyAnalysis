@@ -25,7 +25,9 @@
     let tooltipText: string = $state('');
     let tooltipTextFormatted: string = $derived(tooltipText.length > 100? tooltipText.slice(0, 100) + '...' : tooltipText);
     onMount(() => {
+        // console.log('ok')
         // console.log(selectedElements)
+        // console.log(selectedElements.filter(element => !elementsList[element.code]))
         let elementCodes = Array.from(new Set(selectedElements.filter(element => elementsList[element.code].is_selected).map(element => element.code)));
         tooltipText = elementCodes.join(' + ');
         for (let i = 0; i < count; i++) {

@@ -10,6 +10,8 @@ export class Cell {
 	height: number;
 	elements: Element[];
     borderCoords: number[];
+	penaltyX: number = 0;
+	penaltyY: number = 0;
 
 	constructor(
 		id: number,
@@ -59,6 +61,28 @@ export class Cell {
 		this.height = height;
         this.chengeBorder();
 	}
+	setPenaltyX(penaltyX: number) {
+		if (penaltyX !== this.penaltyX) {
+			let penalty = Math.abs(penaltyX - this.penaltyX);
+			this.penaltyX = penaltyX;
+			this.x_coord += penalty;
+			this.chengeBorder();
+			this.elements.forEach((element) => {
+				element.setPenaltyX(penalty);
+			});
+		}
+	}
+	setPenaltyY(penaltyY: number) {
+		if (penaltyY !== this.penaltyY) {
+			let penalty = Math.abs(penaltyY - this.penaltyY);
+			this.penaltyY = penaltyY;
+			this.y_coord += penalty;
+			this.chengeBorder();
+			this.elements.forEach((element) => {
+				element.setPenaltyY(penalty);
+			});
+		}
+	}
 
     chengeBorder() {
         this.borderCoords = [(this.y_coord - this.height / 2)*this.y_k, (this.x_coord + this.width/2)*this.x_k, (this.y_coord + this.width / 2)*this.y_k, (this.x_coord - this.width / 2)*this.x_k]
@@ -95,9 +119,16 @@ export class Cell {
 					temp = description[i + 1].split(' ');
 					//@ToDo - если 16 коодинат - разбить на три части
 					let positions = temp.slice(1).map((it) => Number(it))
+					let nextLine = description[i + 2]?.split(' ');
+					if (nextLine && nextLine[0] && !isNaN(Number(nextLine[0]))) {
+						positions.push(...nextLine.map((it) => Number(it)));
+					}
 					let positionsXY: number[][] = [];
 					for (let i = 0; i < positions.length; i += 2) {
 						positionsXY.push([positions[i], positions[i + 1]]);
+					}
+					if (positions.find(it => isNaN(it))) {
+						console.log(description[i+1], 'positions', positions)
 					}
 					if (positions.length === 8) {
 						let xMin = Math.min(...positionsXY.map((it) => it[0]));
@@ -123,8 +154,38 @@ export class Cell {
 						let yMax = Math.max(...positionsXY.map((it) => it[1]));
 						let xMiddle = positionsXY.map((it) => it[0]).filter(it => it > xMin && it < xMax)[0];
 						let yMiddle = positionsXY.map((it) => it[1]).filter(it => it > yMin && it < yMax)[0];
-						let positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle, xMin, yMiddle]
-						let positions2 = [xMiddle, yMiddle, xMax, yMiddle, xMax, yMax, xMiddle, yMax]
+						let angleCoords: {[key: string]: number[]} = {
+							'left top': [xMin, yMin],
+							'right top': [xMax, yMin],
+							'right bottom': [xMax, yMax],
+							'left bottom': [xMin, yMax]
+						}
+						let undefCoord = '';
+						for (let key in angleCoords) {
+							if (positionsXY.find(it => it===angleCoords[key]) === undefined) {
+								undefCoord = key;
+								break;
+							}
+						}
+						let positions1: number[] = [];
+						let positions2: number[] = [];
+						if (undefCoord === 'left top') {
+							positions1 = [xMiddle, yMin, xMax, yMin, xMax, yMiddle, xMiddle, yMiddle]
+							positions2 = [xMin, yMiddle, xMax, yMiddle, xMax, yMax, xMin, yMax]
+						}
+						else if (undefCoord === 'right top') {
+							positions1 = [xMin, yMin, xMiddle, yMin, xMiddle, yMiddle, xMin, yMiddle]
+							positions2 = [xMin, yMiddle, xMax, yMiddle, xMax, yMax, xMin, yMax]
+						}
+						else if (undefCoord === 'right bottom') {
+							positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle, xMin, yMiddle]
+							positions2 = [xMin, yMiddle, xMiddle, yMiddle, xMiddle, yMax, xMin, yMax]
+						}
+						else if (undefCoord === 'left bottom') {
+							positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle, xMin, yMiddle]
+							positions2 = [xMiddle, yMiddle, xMax, yMiddle, xMax, yMax, xMiddle, yMax]
+						}
+						if (positions1.length) {
 						let element1 = new Element(
 							name,
 							description[i].split(' ')[1],
@@ -138,7 +199,12 @@ export class Cell {
 							positions2,
 							layout
 						);
+						
 						this.addElement(element2);
+					}
+					else {
+						this.addElement(new Element(name, description[i].split(' ')[1], [xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax], layout));
+					}
 					}
 					else if (positions.length === 16) {
 						let xMin = Math.min(...positionsXY.map((it) => it[0]));
@@ -149,9 +215,34 @@ export class Cell {
 						let xMiddle2 = Math.max(...positionsXY.map((it) => it[0]).filter(it => it > xMin && it < xMax));
 						let yMiddle1 = Math.min(...positionsXY.map((it) => it[1]).filter(it => it > yMin && it < yMax));
 						let yMiddle2 = Math.max(...positionsXY.map((it) => it[1]).filter(it => it > yMin && it < yMax));
-						let positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle1, xMin, yMiddle1];
-						let positions2 = [xMin, yMiddle2, xMiddle1, yMiddle2, xMiddle1, yMax, xMin, yMax];
-						let positions3 = [xMiddle2, yMiddle2, xMax, yMiddle2, xMax, yMax, xMiddle2, yMax];
+						let countDotsTop = positionsXY.filter(it => it[1] === yMin).length;
+						let countDotsBottom = positionsXY.filter(it => it[1] === yMax).length;
+						let countDotsLeft = positionsXY.filter(it => it[0] === xMin).length;
+						let countDotsRight = positionsXY.filter(it => it[0] === xMax).length;
+						let positions1: number[] = [];
+						let positions2: number[] = [];
+						let positions3: number[] = [];
+						if (countDotsTop === 4) {
+							positions1 = [xMin, yMin, xMiddle1, yMin, xMiddle1, yMiddle1, xMin, yMiddle1];
+							positions2 = [xMiddle2, yMin, xMax, yMin, xMax, yMiddle1, xMiddle2, yMiddle1];
+							positions3 = [xMin, yMiddle1, xMax, yMiddle1, xMax, yMax, xMin, yMax];
+						}
+						else if (countDotsBottom === 4) {
+							positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle1, xMin, yMiddle1];
+							positions2 = [xMin, yMiddle1, xMiddle1, yMiddle1, xMiddle1, yMax, xMin, yMax];
+							positions3 = [xMiddle2, yMiddle1, xMax, yMiddle1, xMax, yMax, xMiddle2, yMax];
+						}
+						else if (countDotsLeft === 4) {
+							positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle1, xMin, yMiddle1];
+							positions2 = [xMiddle1, yMiddle1, xMax, yMiddle1, xMax, yMiddle2, xMiddle1, yMiddle2];
+							positions3 = [xMin, yMiddle2, xMax, yMiddle2, xMax, yMax, xMin, yMax];
+						}
+						else if (countDotsRight === 4) {
+							positions1 = [xMin, yMin, xMax, yMin, xMax, yMiddle1, xMin, yMiddle1];
+							positions2 = [xMin, yMiddle1, xMiddle1, yMiddle1, xMiddle1, yMiddle2, xMin, yMiddle2];
+							positions3 = [xMin, yMiddle2, xMax, yMiddle2, xMax, yMax, xMin, yMax];
+						}	
+						if (positions1.length && positions2.length && positions3.length) {
 						let element1 = new Element(
 							name,
 							description[i].split(' ')[1],
@@ -173,6 +264,13 @@ export class Cell {
 							layout
 						);
 						this.addElement(element3);
+					}
+					else {
+						this.addElement(new Element(name, description[i].split(' ')[1], [xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax], layout));
+					}
+					}
+					if (this.elements.find(e => isNaN(e.getSize()[0]) || isNaN(e.getSize()[1]))) {
+						console.log('elements', description[i+1])
 					}
 					layout++;
 					i++;
