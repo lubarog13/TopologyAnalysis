@@ -10,13 +10,14 @@
         count: number,
         selectedElements: Element[],
         style: string,
-        className: string
+        className: string,
+        onComplete: (callback: () => void) => void
     }
     interface DiagramItem {
         column: number,
         areas: {[name: string]: number}
     }
-    let {direction, cells, count, selectedElements, style, className}: Props = $props();
+    let {direction, cells, count, selectedElements, style, className, onComplete}: Props = $props();
 
     let diagramItems: DiagramItem[] = $state([]);
     let size: number = $state(0);
@@ -52,10 +53,17 @@
         }
         selectedColor = elementCodes.length > 0 ? elementsList[elementCodes[0]].color : '';
         size = direction === 'column' ? document.getElementsByClassName('element-table')[0].clientHeight : document.getElementsByClassName('element-table')[0].clientWidth;
+        console.log('size', size)
         codes = direction==='column'? Object.keys(diagramItems[0].areas).sort() : Object.keys(diagramItems[0].areas).sort().reverse();
         // console.log(diagramItems)
+        onComplete(changeSize);
 
     })
+
+    function changeSize() {
+        size = direction === 'column' ? document.getElementsByClassName('element-table')[0].clientHeight : document.getElementsByClassName('element-table')[0].clientWidth;
+        console.log('size', size)
+    }
 </script>
 
 <div id="diagram-line-{direction}" class="diagram-line grid {className}" style="{style} {direction === 'column' ? 'grid-template-rows' : 'grid-template-columns'}: repeat({count}, 1fr); {direction === 'column' ? 'height' : 'width'}: {size}px;">

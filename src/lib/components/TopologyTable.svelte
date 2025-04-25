@@ -34,6 +34,8 @@
 	let isLoading = $state(false);
 	let startTime: number = $state(0);
 	let endTime: number = $state(0);
+	let changeSizeRow: () => void = $state(() => {});
+	let changeSizeColumn: () => void = $state(() => {});
 	onMount(() => {
 		canvas = document.getElementById('topology-table-canvas') as HTMLCanvasElement;
 		ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -146,7 +148,11 @@
 						}
 					}
 				}
+				console.log('drawComplete', drawComplete)
 				drawComplete = true;
+				console.log('drawComplete', drawComplete)
+				changeSizeRow();
+				changeSizeColumn();
 				if (firstDraw) {
 					firstDraw = false;
 					showCustomGrid = true;
@@ -215,8 +221,8 @@
 		</div>
 		{/if}
 		<div class="grid grid-cols-2 gap-1 grid-cols-[50px_minmax(0,_1fr)]">
-			{#if gridCells.length > 0	}
-				<DiagramLine className="mt-0 sm:mt-3" style="" direction="column" cells={gridCells} count={customGridRows} selectedElements={elements} color="var(--color-primary-700)" />
+			{#if drawComplete && gridCells.length > 0	}
+				<DiagramLine onComplete={(fn) => {changeSizeColumn = fn}} className="mt-0 sm:mt-3" style="" direction="column" cells={gridCells} count={customGridRows} selectedElements={elements} color="var(--color-primary-700)" />
 			{:else}
 				<div class="w-full h-full mt-0 sm:mt-3  sm:mt-3"></div>
 			{/if}
@@ -258,9 +264,9 @@
 			{/if}
 		{/if}
 	</div>
-	{#if gridCells.length > 0}
+	{#if drawComplete && gridCells.length > 0}
 	<div></div>
-	<DiagramLine className="" style="" direction="row" cells={gridCells} count={customGridCols} selectedElements={elements}  />
+	<DiagramLine onComplete={(fn) => {changeSizeRow = fn}} className="" style="" direction="row" cells={gridCells} count={customGridCols} selectedElements={elements}  />
 	{/if}
 	</div>
 	</div>
