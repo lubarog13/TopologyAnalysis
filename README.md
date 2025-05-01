@@ -16,7 +16,7 @@
 3. Выберете необходимые для отображения и анализа слои.
    ![image](./static/files/screenshots/layers.png)
 4. Отрегулируйте желаемый шаг сетки с помощью ползунков сверху.
-    ![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/files/screenshots/grid.png)
+    ![image](./static/files/screenshots/grid.png)
 5. ___При нажатии на ячейку сетки___ слева сверху появится детальная диаграмма с распределением слоев внутри ячейки.
     ![image](./static/files/screenshots/diagram.png)
 
