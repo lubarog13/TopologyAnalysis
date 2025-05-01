@@ -180,7 +180,7 @@
 
 	const changeGrid = debounce((row: number, col: number) => {
 		gridChanged = true;
-		if ((customGridRows > 30 || customGridCols > 30) && (customGridRows !== row || customGridCols !== col)) {
+		if ((row > 30 || col > 30) && (customGridRows !== row || customGridCols !== col)) {
 			showCustomGrid = false;
 		}
 		customGridRows = row;
@@ -247,10 +247,6 @@
 									: '--color-gray-200'}) border-10 border-dashed"
 								style="left: {cell.borderCoords[3]}px; top: {cell
 									.borderCoords[0]}px;width: {cell.width}px;height: {cell.height}px;"
-								onclick={() => {
-									selectedCell = cells[index];
-									onCellSelected(selectedCell);
-								}}
 							></div>
 						{/if}
 					{/each}

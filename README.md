@@ -4,18 +4,26 @@
 
 Данная проект представляет собой программу, выводящую на диаграмме заполненность ячеек СБИС элементами, а также количество пустого пространства, с целью оптимизации использования места.
 
+![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/screenshots/topology.png)
+
 ## Правила использования
 
 1. Введите текст топологии в соответствующее поле или выбирете файл (поддерживаются форматы `.cif` и `.txt`).
+   ![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/screenshots/form.png)
 2. Убедитесь, что схема корректно отрисована.
 3. Выберете необходимые для отображения и анализа слои.
+   ![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/screenshots/layers.png)
 4. Отрегулируйте желаемый шаг сетки с помощью ползунков сверху.
+    ![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/screenshots/grid.png)
 5. ___При нажатии на ячейку сетки___ слева сверху появится детальная диаграмма с распределением слоев внутри ячейки.
+    ![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/screenshots/diagram.png)
 
 > ___Внимание___: мы не ручаемся, что отображение топологии будет корректным ввиду того, что различные САПР используют различные форматы языка `CIF`.
 
 Вы можете отключить отображение сетки.
 По-умолчанию выделение ячеек скрывается, если количество строк или колонок превышает 30.
+
+   ![image](https://github.com/lubarog13/TopologyAnalysis/tree/main/static/screenshots/analysis.png)
 
 ## Список поддерживаемых слоев
 
