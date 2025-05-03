@@ -19,14 +19,15 @@
 </script>
 
 <div class="cell-item border-2 border-dashed border-gray-500">
-		<canvas style="width: 100%; height: 100%;" bind:this={canvas}></canvas>
+	<canvas style="width: 100%; height: 100%;" bind:this={canvas}></canvas>
 </div>
+
 <style>
-    .cell-item {
-        position: relative;
-    }
-    .cell-item canvas {
-        width: 100%;
-        height: 100%;
-    }
+	.cell-item {
+		position: relative;
+	}
+	.cell-item canvas {
+		width: 100%;
+		height: 100%;
+	}
 </style>

@@ -16,9 +16,11 @@
     let {elements, width, height, cellsCountCols, cellsCountRows, onCellSelected, setGridCells, showGrid}: Props = $props();
     let cells: GridCell[] = $state([]);
     let selectedIndex: number | null = $state(null);
+
     onMount(() => {
         replaceCellSize()
     });
+    
     function replaceCellSize() {
         onCellSelected(null);
         cells = []
@@ -27,16 +29,12 @@
         for(let i = 0;i< cellsCountRows;i++) {
             for (let j = 0; j < cellsCountCols;j++) {
                 cells.push(new GridCell(j, i, widthCell * j, heightCell * i, widthCell, heightCell));
-                // console.log(cells[cells.length - 1], elements.filter(element => elementsList[element.code].visible && !elementsList[element.code].negative))
             }
         }
         setGridCells(cells);
-        // console.log('cells', cells)
     }
     const selectCell = (index: number) => {
-        // console.log(index)
         cells[index].setElementsAreas(elements.filter(element => elementsList[element.code].visible && !elementsList[element.code].negative))
-        // console.log(cells[index])
         selectedIndex = index;
         onCellSelected(cells[index])
     }

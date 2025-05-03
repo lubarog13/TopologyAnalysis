@@ -25,11 +25,9 @@
     let codes: string[] = $state([]);
     let tooltipText: string = $state('');
     let tooltipTextFormatted: string = $derived(tooltipText.length > 100? tooltipText.slice(0, 100) + '...' : tooltipText);
-    onMount(() => {
-        // console.log('ok')
-        // console.log(selectedElements)
-        // console.log(selectedElements.filter(element => !elementsList[element.code]))
-        let elementCodes = Array.from(new Set(selectedElements.filter(element => elementsList[element.code].is_selected).map(element => element.code)));
+
+    
+    onMount(() => {        let elementCodes = Array.from(new Set(selectedElements.filter(element => elementsList[element.code].is_selected).map(element => element.code)));
         tooltipText = elementCodes.join(' + ');
         for (let i = 0; i < count; i++) {
             diagramItems.push({column: i, areas: {}})
@@ -39,30 +37,25 @@
 
         for (let i = 0; i < count; i++) {
             let cellsInDirection = cells.filter(cell => direction === 'column' ? cell.y_index === i : cell.x_index === i);
-            // console.log(cellsInDirection)
             cellsInDirection.forEach(cell => {
                 Object.entries(cell.getAreasForLineDiagram(selectedElements, tooltipText)).forEach(([code, area]) => {
                     diagramItems[i].areas[code] += area;
                 });
             })
             let totalArea = Object.values(diagramItems[i].areas).reduce((acc, area) => acc + area, 0);
-            console.log(cellsInDirection.length)
             Object.entries(diagramItems[i].areas).forEach(([code, area]) => {
                 diagramItems[i].areas[code] = (area / totalArea) * 100;
             });
         }
         selectedColor = elementCodes.length > 0 ? elementsList[elementCodes[0]].color : '';
         size = direction === 'column' ? document.getElementsByClassName('element-table')[0].clientHeight : document.getElementsByClassName('element-table')[0].clientWidth;
-        console.log('size', size)
         codes = direction==='column'? Object.keys(diagramItems[0].areas).sort() : Object.keys(diagramItems[0].areas).sort().reverse();
-        // console.log(diagramItems)
         onComplete(changeSize);
 
     })
 
     function changeSize() {
         size = direction === 'column' ? document.getElementsByClassName('element-table')[0].clientHeight : document.getElementsByClassName('element-table')[0].clientWidth;
-        console.log('size', size)
     }
 </script>
 

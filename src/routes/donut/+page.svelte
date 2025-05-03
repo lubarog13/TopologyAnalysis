@@ -28,21 +28,25 @@
 </script>
 
 <div class="container mx-auto min-h-200 py-4">
-	<div class="grid grid-cols-1 gap-4 md:gap-8 md:grid-cols-2 w-full">
-        <div class="w-full">
-            		<Breadcrumb>
-			<BreadcrumbItem href={base + '/'} home>Главная</BreadcrumbItem>
-			<BreadcrumbItem href={base + '/donut'}>Поддержать проект</BreadcrumbItem>
-		</Breadcrumb>
-		<Heading tag="h1" class="mt-4 mb-6">Поддержать проект</Heading>
-		<P>Если вам понравилась программа, вы можете поддержать её разработку.</P>
-		<Listgroup active items={variants} let:item class="mt-4 max-w-2xl">
-			<svelte:component this={item.icon} class="me-2.5 h-4 w-4" />
-			{item.name}
-		</Listgroup>
-        </div>
-        <div class="w-full">
-            <img src={base + '/images/charity-concept.png'} alt="Поддержать проект" class="w-full h-full object-cover">
-        </div>
+	<div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-8">
+		<div class="w-full">
+			<Breadcrumb>
+				<BreadcrumbItem href={base + '/'} home>Главная</BreadcrumbItem>
+				<BreadcrumbItem href={base + '/donut'}>Поддержать проект</BreadcrumbItem>
+			</Breadcrumb>
+			<Heading tag="h1" class="mt-4 mb-6">Поддержать проект</Heading>
+			<P>Если вам понравилась программа, вы можете поддержать её разработку.</P>
+			<Listgroup active items={variants} let:item class="mt-4 max-w-2xl">
+				<svelte:component this={item.icon} class="me-2.5 h-4 w-4" />
+				{item.name}
+			</Listgroup>
+		</div>
+		<div class="w-full">
+			<img
+				src={base + '/images/charity-concept.png'}
+				alt="Поддержать проект"
+				class="h-full w-full object-cover"
+			/>
+		</div>
 	</div>
 </div>

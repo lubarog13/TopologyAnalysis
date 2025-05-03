@@ -127,18 +127,15 @@ export class Cell {
 					for (let i = 0; i < positions.length; i += 2) {
 						positionsXY.push([positions[i], positions[i + 1]]);
 					}
-					if (positions.find(it => isNaN(it))) {
-						console.log(description[i+1], 'positions', positions)
-					}
-					if (positions.length === 8) {
+					const placePositions = (positionsXY: number[][]) => {
 						let xMin = Math.min(...positionsXY.map((it) => it[0]));
 						let xMax = Math.max(...positionsXY.map((it) => it[0]));
 						let yMin = Math.min(...positionsXY.map((it) => it[1]));
 						let yMax = Math.max(...positionsXY.map((it) => it[1]));
-						positions = [
-							xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax
-						]
-
+						return [xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax]
+					}
+					if (positions.length === 8) {
+						positions = placePositions(positionsXY);
 						let element = new Element(
 							name,
 							description[i].split(' ')[1],
@@ -269,9 +266,6 @@ export class Cell {
 						this.addElement(new Element(name, description[i].split(' ')[1], [xMin, yMin, xMax, yMin, xMax, yMax, xMin, yMax], layout));
 					}
 					}
-					if (this.elements.find(e => isNaN(e.getSize()[0]) || isNaN(e.getSize()[1]))) {
-						console.log('elements', description[i+1])
-					}
 					layout++;
 					i++;
 				}
@@ -320,7 +314,6 @@ export class Cell {
         let right = Math.min(element1.coords[1], element2.coords[1])
         let bottom = Math.min(element1.coords[2], element2.coords[2])
         let top = Math.max(element1.coords[0], element2.coords[0]);
-        // console.log(element1.coords, element2.coords, top, bottom)
         elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), left, top, Math.min(element1.coords[3], element2.coords[3])]))
         elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), right, top, left]))
         elements.push(createElementWithCoords([top, left, bottom, Math.min(element1.coords[3], element2.coords[3])]))
@@ -333,7 +326,6 @@ export class Cell {
 
 	splitAllElements(): Element[] {
 		let newElements: Element[] = [...this.elements];
-		//@ToDo: допилить по элементам
 		return newElements;
 	}
 

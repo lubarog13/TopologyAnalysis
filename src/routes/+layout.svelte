@@ -6,15 +6,13 @@
 	import { page } from '$app/stores';
 	import { derived } from 'svelte/store';
 
-	export const currentUrl = derived(page, $page => $page.url);
+	export const currentUrl = derived(page, ($page) => $page.url);
 
+	let { children }: LayoutProps = $props();
 
-	let {  children }: LayoutProps = $props();
-	import { onMount } from 'svelte';
-
-	let action = derived(currentUrl, $currentUrl => $currentUrl.searchParams.get('action'));
+	let action = derived(currentUrl, ($currentUrl) => $currentUrl.searchParams.get('action'));
 </script>
 
-<Navbar :action={action}/>
+<Navbar :action={action} />
 {@render children()}
 <Footer />

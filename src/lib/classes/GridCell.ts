@@ -57,7 +57,6 @@ export class GridCell {
             newElement.coords[3] = Math.max(newElement.coords[3], this.x_coord)
         }
         newElement.positions = [newElement.coords[3], newElement.coords[0], newElement.coords[1], newElement.coords[0], newElement.coords[1], newElement.coords[2], newElement.coords[3], newElement.coords[2]]
-        // console.log('1', newElement)
         return newElement;
     }
 
@@ -96,7 +95,6 @@ export class GridCell {
             }
         }
         newElements.push(currentElement)
-        // console.log('7', newElements)
         return newElements;
     }
 
@@ -119,12 +117,10 @@ export class GridCell {
     splitOverlappingElementsNew(elements: Element[]): Element[] {
         let newElements: Element[] = []
         let elementsCopy = [...elements]
-        // console.log('elementsCopy', elementsCopy.filter(element => isNaN(element.getSize()[0]) || isNaN(element.getSize()[1])))
         let x_coords = elements.map(element => element.coords[3]);
         x_coords.push(...elements.map(element => element.coords[1]));
         x_coords = Array.from(new Set(x_coords));
         x_coords.sort((a, b) => a - b);
-        // console.log(x_coords)
         let removeDuplicates = (elements: Element[]) => {
             let i = 0, k=0;
             while (i < elements.length && k < 100) {
@@ -143,7 +139,6 @@ export class GridCell {
         }
         removeDuplicates(elementsCopy)
         let n = elementsCopy.length;
-        // console.log('6', elementsCopy)
         for (let j=0; j<n; j++) {
             newElements.push(...this.splitElementByXCoords(elementsCopy[j], x_coords))
         }
@@ -170,7 +165,6 @@ export class GridCell {
         let right = Math.min(element1.coords[1], element2.coords[1])
         let bottom = Math.min(element1.coords[2], element2.coords[2])
         let top = Math.max(element1.coords[0], element2.coords[0]);
-        // console.log(element1.coords, element2.coords, top, bottom)
         elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), left, top, Math.min(element1.coords[3], element2.coords[3])]))
         elements.push(createElementWithCoords([Math.min(element1.coords[0], element2.coords[0]), right, top, left]))
         elements.push(createElementWithCoords([top, left, bottom, Math.min(element1.coords[3], element2.coords[3])]))
@@ -183,7 +177,6 @@ export class GridCell {
 
     splitAllElements(elements: Element[]): Element[] {
         let newElements: Element[] = [...elements];
-        // console.log(newElements);
         for (let i = 0; i < newElements.length; i++) {
             for (let j = i + 1; j < newElements.length; j++) {
                 if (this.checkElementInsideAnotherElement(newElements[i], newElements[j]) === 1) {
@@ -203,11 +196,8 @@ export class GridCell {
                 }
                 else if (this.checkElementIsInCoords(newElements[i], newElements[j].coords[3], newElements[j].coords[0], newElements[j].coords[1], newElements[j].coords[2], false)) {
                     newElements.push(...this.splitOverlappingElements(newElements[i], newElements[j]).filter(element => element.getSize()[0] * element.getSize()[1] > 0));
-                    // console.log(this.splitOverlappingElements(newElements[i], newElements[j]).map(element => element.getSize()));
-                    // console.log(newElements)
                     newElements.splice(j, 1);
                     newElements.splice(i, 1);
-                    // console.log(newElements.length)
                     i=-1;
                     break;
                 }
@@ -229,28 +219,19 @@ export class GridCell {
             i++;
             k++;
         }
-        // console.log(k);
         return newElements;
     }
 
 
     getAreas(elements: Element[]): [number, number] {
-        // console.log('1', elements);
-        // console.log('2', elements.map(element => this.resizeElementToCell(element)));
-        // console.log(this.x_coord, this.y_coord, this.width, this.height)
         let elementsSized = this.splitOverlappingElementsNew(elements.map(element => this.resizeElementToCell(element)));
-        // console.log('3', elementsSized);
-        // console.log(elementsSized.map(element => element.getSize()));
         let sumElementsAreas = elementsSized.reduce((acc, element) => acc + element.getSize()[0] * element.getSize()[1], 0);
-        // console.log('elementsSized', elementsSized.filter(element => isNaN(element.getSize()[0]) || isNaN(element.getSize()[1])))
-        // console.log('sumElementsAreas', sumElementsAreas)
         let emptySpaceArea = this.width * this.height - sumElementsAreas;
         return [sumElementsAreas, emptySpaceArea];
     }
 
 
     setElementsAreas(elements: Element[]) {
-        // console.log(this.x_coord, this.y_coord)
 
         this.elements['Пустое пространство'] = this.getAreas(elements.filter(element => this.checkElementIsInCoords(element, this.x_coord, this.y_coord, this.width, this.height)))[1];
         elements.forEach(element => {
@@ -266,14 +247,9 @@ export class GridCell {
 
     getAreasForLineDiagram(elements: Element[], code: string): {[name: string]: number} {
         let areas = this.getAreas(elements.filter(element => elementsList[element.code].is_selected && this.checkElementIsInCoords(element, this.x_coord, this.y_coord, this.width, this.height)));
-        // console.log('areas', areas)
         return {
             [code]: areas[0],
             'Пустое пространство': areas[1]
         }
     }
-
-    // getAreasForSpecificElements(elements: Element[]): {[name: string]: number} {
-    //     let filteredAreas Object.fromEntries(Object.entries(this.elements).filter(([key]) => elements.some(element => element.code === key || key === 'Пустое пространство')));
-    // }
 }
